@@ -40,14 +40,16 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
             {navItems.map(item => (
               <Link key={item.href} href={item.href} asChild>
                 <Button
-                  // No asChild here, Link's asChild handles it.
+                  asChild // Button also becomes a slot
                   className={cn(
                     "flex flex-col items-center justify-center h-16 w-full rounded-md text-muted-foreground hover:text-primary",
                     (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) && "text-primary bg-primary/10"
                   )}
                 >
-                  <item.icon className="h-6 w-6 mb-0.5" />
-                  <span className="text-xs">{item.label}</span>
+                  <a> {/* This 'a' tag receives className from Button and href from Link */}
+                    <item.icon className="h-6 w-6 mb-0.5" />
+                    <span className="text-xs">{item.label}</span>
+                  </a>
                 </Button>
               </Link>
             ))}
