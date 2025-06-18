@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 
 interface Notification {
   id: string;
@@ -271,4 +272,3 @@ export default function SchoolAdminNotificationsPage() {
     </>
   );
 }
-
