@@ -24,14 +24,16 @@ export function SchoolAdminSidebarNav() {
     <SidebarMenu>
       {navItems.map((item) => (
         <SidebarMenuItem key={item.label}>
-          <Link href={item.href} passHref legacyBehavior>
+          <Link href={item.href} passHref>
             <SidebarMenuButton
+              asChild
               isActive={pathname === item.href || (item.href !== '/school-admin' && pathname.startsWith(item.href))}
               tooltip={{ children: item.label, side: 'right', align: 'center' }}
-              asChild={false}
             >
-              <item.icon />
-              <span>{item.label}</span>
+              <>
+                <item.icon />
+                <span>{item.label}</span>
+              </>
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
