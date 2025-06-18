@@ -1,0 +1,216 @@
+
+"use client";
+
+import { useState, useEffect } from 'react';
+import { PageHeader } from '@/components/PageHeader';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Bell, CalendarDays, UserCircle, MessageSquare, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+
+interface Child {
+  id: string;
+  name: string;
+  avatarUrl: string;
+  schoolName: string;
+  grade: string;
+  unreadNotifications: number;
+  upcomingEvents: number;
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  summary: string;
+  date: string;
+  type: 'announcement' | 'homework' | 'exam' | 'event' | 'urgent';
+  read: boolean;
+  sender: string; // Teacher name or School Admin
+  courseName?: string; // Optional course name
+}
+
+const mockChildren: Child[] = [
+  { id: 'child1', name: 'Alex Johnson', avatarUrl: 'https://placehold.co/100x100.png?text=AJ', schoolName: 'Greenwood High', grade: 'Grade 5', unreadNotifications: 2, upcomingEvents: 1 },
+  { id: 'child2', name: 'Mia Williams', avatarUrl: 'https://placehold.co/100x100.png?text=MW', schoolName: 'Riverside Elementary', grade: 'Grade 2', unreadNotifications: 0, upcomingEvents: 3 },
+];
+
+const mockNotifications: Notification[] = [
+    { id: 'n1', title: 'School Picnic Day', summary: 'Annual school picnic is scheduled for next Friday. Please sign the permission slip.', date: '3 days ago', type: 'event', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide' },
+    { id: 'n2', title: 'Math Homework Ch.5', summary: 'Complete exercises 1-10 from Chapter 5 by tomorrow.', date: '1 day ago', type: 'homework', read: false, sender: 'Ms. Davis', courseName: 'Mathematics Grade 5' },
+    { id: 'n3', title: 'Science Fair Update', summary: 'Project submission deadline extended to next Monday.', date: '5 days ago', type: 'announcement', read: true, sender: 'Mr. Smith', courseName: 'Science Grade 5' },
+    { id: 'n4', title: 'Parent-Teacher Meeting', summary: 'Scheduled for Grade 2 on Oct 25th.', date: '2 days ago', type: 'event', read: false, sender: 'Riverside Elementary Admin', courseName: 'School-Wide'},
+    { id: 'n5', title: 'Urgent: School Closure', summary: 'School closed tomorrow due to bad weather.', date: '1 hour ago', type: 'urgent', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide'},
+];
+
+
+const getNotificationIcon = (type: Notification['type']) => {
+  switch (type) {
+    case 'urgent': return <AlertTriangle className="h-5 w-5 text-destructive" />;
+    case 'homework': return <MessageSquare className="h-5 w-5 text-blue-500" />;
+    case 'exam': return <FileText className="h-5 w-5 text-orange-500" />; // Assuming FileText is for exams
+    case 'event': return <CalendarDays className="h-5 w-5 text-purple-500" />;
+    default: return <Info className="h-5 w-5 text-primary" />;
+  }
+};
+
+export default function ParentDashboardPage() {
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const [children, setChildren] = useState<Child[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    // Simulate fetching data
+    setChildren(mockChildren);
+    if (mockChildren.length > 0) {
+      setSelectedChildId(mockChildren[0].id);
+    }
+    // Filter notifications for the selected child or show all if none selected (or implement child-specific fetching)
+    setNotifications(mockNotifications.slice(0,3)); // Show first 3 for overview
+  }, []);
+
+  const selectedChild = children.find(c => c.id === selectedChildId);
+
+  return (
+    <>
+      <PageHeader
+        title={selectedChild ? `${selectedChild.name}'s Dashboard` : "Parent Dashboard"}
+        description="Stay updated with your child's school activities."
+      />
+
+      {children.length > 1 && (
+        <Card className="mb-6 shadow-md">
+          <CardContent className="p-4">
+            <Label htmlFor="child-select" className="text-sm font-medium">Select Child:</Label>
+            <Select value={selectedChildId || ''} onValueChange={setSelectedChildId}>
+              <SelectTrigger id="child-select" className="w-full md:w-[280px] mt-1">
+                <SelectValue placeholder="Select a child" />
+              </SelectTrigger>
+              <SelectContent>
+                {children.map(child => (
+                  <SelectItem key={child.id} value={child.id}>
+                    <div className="flex items-center">
+                      <Avatar className="h-6 w-6 mr-2">
+                        <AvatarImage src={child.avatarUrl} alt={child.name} data-ai-hint="child avatar"/>
+                        <AvatarFallback>{child.name.substring(0,1)}</AvatarFallback>
+                      </Avatar>
+                      {child.name} ({child.grade} - {child.schoolName})
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
+
+      {selectedChild && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-headline">Unread Notifications</CardTitle>
+              <Bell className="h-5 w-5 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{selectedChild.unreadNotifications}</div>
+              <p className="text-xs text-muted-foreground">Important updates</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-headline">Upcoming Events</CardTitle>
+              <CalendarDays className="h-5 w-5 text-accent" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{selectedChild.upcomingEvents}</div>
+              <p className="text-xs text-muted-foreground">In the next 7 days</p>
+            </CardContent>
+          </Card>
+           <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-headline">Child Profile</CardTitle>
+              <UserCircle className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+               <div className="flex items-center space-x-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedChild.avatarUrl} alt={selectedChild.name} data-ai-hint="child avatar" />
+                  <AvatarFallback>{selectedChild.name.substring(0,1)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-semibold">{selectedChild.name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedChild.grade} - {selectedChild.schoolName}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Card className="shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="font-headline">Recent Notifications</CardTitle>
+            <CardDescription>Latest updates for {selectedChild ? selectedChild.name : 'your children'}.</CardDescription>
+          </div>
+          <Link href="/parent/notifications" passHref>
+            <Button variant="outline" size="sm">View All</Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {notifications.length > 0 ? (
+            <ul className="space-y-4">
+              {notifications.map((notif, index) => (
+                <li key={notif.id}>
+                  <Link href={`/parent/notifications/${notif.id}`} className="block p-4 rounded-lg hover:bg-muted/50 transition-colors border">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 pt-0.5">
+                        {getNotificationIcon(notif.type)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className={`font-semibold ${notif.type === 'urgent' ? 'text-destructive' : 'text-foreground'}`}>{notif.title}</p>
+                          {!notif.read && <Badge variant="default" className="bg-primary text-primary-foreground text-xs">New</Badge>}
+                        </div>
+                         <p className="text-sm text-muted-foreground mt-0.5">{notif.summary}</p>
+                         <div className="text-xs text-muted-foreground mt-1.5 flex items-center justify-between">
+                            <span>From: {notif.sender} {notif.courseName && `(${notif.courseName})`}</span>
+                            <span>{notif.date}</span>
+                         </div>
+                      </div>
+                    </div>
+                  </Link>
+                   {index < notifications.length - 1 && <Separator className="my-4" />}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground text-center py-8">No recent notifications.</p>
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+// Dummy FileText component if not available from lucide-react (it is, but as an example)
+const FileText = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+    <polyline points="10 9 9 9 8 9"></polyline>
+  </svg>
+);
+
