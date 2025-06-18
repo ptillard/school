@@ -38,18 +38,16 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         <footer className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
           <nav className="container grid grid-cols-4 items-center justify-items-center gap-1 p-2">
             {navItems.map(item => (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} href={item.href} asChild>
                 <Button
-                  asChild
+                  // No asChild here, Link's asChild handles it.
                   className={cn(
                     "flex flex-col items-center justify-center h-16 w-full rounded-md text-muted-foreground hover:text-primary",
                     (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) && "text-primary bg-primary/10"
                   )}
                 >
-                  <>
-                    <item.icon className="h-6 w-6 mb-0.5" />
-                    <span className="text-xs">{item.label}</span>
-                  </>
+                  <item.icon className="h-6 w-6 mb-0.5" />
+                  <span className="text-xs">{item.label}</span>
                 </Button>
               </Link>
             ))}
