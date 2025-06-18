@@ -38,19 +38,18 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         <footer className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
           <nav className="container grid grid-cols-4 items-center justify-items-center gap-1 p-2">
             {navItems.map(item => (
-              <Link key={item.href} href={item.href} passHref>
+              <Link key={item.href} href={item.href} passHref legacyBehavior>
                 <Button
-                  variant="ghost"
                   asChild
                   className={cn(
                     "flex flex-col items-center justify-center h-16 w-full rounded-md text-muted-foreground hover:text-primary",
                     (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) && "text-primary bg-primary/10"
                   )}
                 >
-                  <>
+                  <a className="flex flex-col items-center justify-center h-full w-full"> {/* Changed from React.Fragment to 'a' or 'span'. 'a' is better for semantic linking. */}
                     <item.icon className="h-6 w-6 mb-0.5" />
                     <span className="text-xs">{item.label}</span>
-                  </>
+                  </a>
                 </Button>
               </Link>
             ))}
