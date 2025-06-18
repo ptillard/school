@@ -21,7 +21,7 @@ export default function SchoolAdminDashboardPage() {
         title="School Dashboard"
         description="Welcome, School Administrator! Manage your school's operations."
          actions={
-          <Link href="/school-admin/notifications/new">
+          <Link href="/school-admin/notifications?action=new" passHref>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
               New Notification
@@ -82,32 +82,32 @@ export default function SchoolAdminDashboardPage() {
           <CardDescription>Common tasks for school administration.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          <Link href="/school-admin/users/new-student">
+          <Link href="/school-admin/users?action=new-student" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
               <Users className="mr-2 h-5 w-5" /> Add New Student
             </Button>
           </Link>
-          <Link href="/school-admin/courses/new">
+          <Link href="/school-admin/courses?action=new-course" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
               <BookOpen className="mr-2 h-5 w-5" /> Create New Course
             </Button>
           </Link>
-          <Link href="/school-admin/calendar/new-event">
+          <Link href="/school-admin/calendar?action=new-event" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
               <CalendarPlus className="mr-2 h-5 w-5" /> Create New Event
             </Button>
           </Link>
-           <Link href="/school-admin/users/new-teacher">
+           <Link href="/school-admin/users?action=new-teacher" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
               <Users className="mr-2 h-5 w-5" /> Add New Teacher
             </Button>
           </Link>
-          <Link href="/school-admin/notifications">
+          <Link href="/school-admin/notifications" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
               <MessageSquare className="mr-2 h-5 w-5" /> View All Notifications
             </Button>
           </Link>
-          <Link href="/school-admin/customize">
+          <Link href="/school-admin/customize" passHref>
             <Button variant="outline" className="w-full justify-start py-6">
              <Palette className="mr-2 h-5 w-5" /> Customize Branding
             </Button>

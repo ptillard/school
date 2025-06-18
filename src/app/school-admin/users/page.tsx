@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,6 +71,7 @@ const mockStaff: User[] = [
 
 export default function ManageUsersPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState<User[]>([...mockStudents, ...mockTeachers, ...mockStaff]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -86,24 +88,42 @@ export default function ManageUsersPage() {
   const [userStatus, setUserStatus] = useState<'active' | 'invited'>('invited');
 
   useEffect(() => {
-    if (editingUser) {
-      setUserName(editingUser.name);
-      setUserEmail(editingUser.email);
-      setUserRole(editingUser.role);
-      setUserGrade(editingUser.grade || '');
-      setUserSubject(editingUser.subject || '');
-      setUserDepartment(editingUser.department || '');
-      setUserStatus(editingUser.status === 'inactive' ? 'invited' : editingUser.status); // Map inactive to invited for form
-    } else {
-      setUserName('');
-      setUserEmail('');
-      setUserRole(activeTab); // Default to active tab for new user
-      setUserGrade('');
-      setUserSubject('');
-      setUserDepartment('');
-      setUserStatus('invited');
+    const action = searchParams.get('action');
+    if (action === 'new-student') {
+      setEditingUser(null);
+      setActiveTab('student');
+      setUserRole('student'); // Ensure role is set for the form
+      setIsFormOpen(true);
+    } else if (action === 'new-teacher') {
+      setEditingUser(null);
+      setActiveTab('teacher');
+      setUserRole('teacher'); // Ensure role is set for the form
+      setIsFormOpen(true);
     }
-  }, [editingUser, isFormOpen, activeTab]);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFormOpen) { // Only manage form state if dialog is open
+        if (editingUser) {
+        setUserName(editingUser.name);
+        setUserEmail(editingUser.email);
+        setUserRole(editingUser.role);
+        setUserGrade(editingUser.grade || '');
+        setUserSubject(editingUser.subject || '');
+        setUserDepartment(editingUser.department || '');
+        setUserStatus(editingUser.status === 'inactive' ? 'invited' : editingUser.status);
+        } else {
+        // Reset form for new user, ensuring role is correct based on activeTab or explicit setUserRole call
+        setUserName('');
+        setUserEmail('');
+        // userRole is already set by setActiveTab or direct setUserRole in the other useEffect
+        setUserGrade('');
+        setUserSubject('');
+        setUserDepartment('');
+        setUserStatus('invited');
+        }
+    }
+  }, [editingUser, isFormOpen, userRole]); // userRole added to dependencies
 
   const handleFormSubmit = () => {
     if (!userName || !userEmail) {
@@ -121,7 +141,7 @@ export default function ManageUsersPage() {
       setUsers(users.map(u => u.id === editingUser.id ? { ...editingUser, ...commonFields, ...specificFields } : u));
       toast({ title: "User Updated", description: `${userName}'s profile has been updated.`, className: "bg-accent text-accent-foreground" });
     } else {
-      const newUser: User = { id: String(Date.now()), ...commonFields, ...specificFields };
+      const newUser: User = { id: String(Date.now()), ...commonFields, ...specificFields, lastLogin: undefined };
       setUsers([newUser, ...users]);
       toast({ title: "User Added", description: `${userName} has been added as a ${userRole}. An invitation email would be sent.`, className: "bg-accent text-accent-foreground" });
     }
@@ -130,19 +150,18 @@ export default function ManageUsersPage() {
   };
 
   const handleDeleteUser = (userId: string) => {
-    // Add confirmation dialog in real app
     setUsers(users.filter(u => u.id !== userId));
     toast({ title: "User Deleted", variant: "destructive" });
   };
 
-  const getFilteredUsers = (role: UserRole) => users.filter(user =>
-    user.role === role &&
+  const getFilteredUsers = (roleFilter: UserRole) => users.filter(user =>
+    user.role === roleFilter &&
     (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
      user.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const UserTable = ({ role }: { role: UserRole }) => {
-    const data = getFilteredUsers(role);
+  const UserTable = ({ roleFilter }: { roleFilter: UserRole }) => {
+    const data = getFilteredUsers(roleFilter);
     return (
       <div className="overflow-x-auto">
         <Table>
@@ -150,9 +169,9 @@ export default function ManageUsersPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
-              {role === 'student' && <TableHead>Grade</TableHead>}
-              {role === 'teacher' && <TableHead>Subject</TableHead>}
-              {role === 'staff' && <TableHead>Department</TableHead>}
+              {roleFilter === 'student' && <TableHead>Grade</TableHead>}
+              {roleFilter === 'teacher' && <TableHead>Subject</TableHead>}
+              {roleFilter === 'staff' && <TableHead>Department</TableHead>}
               <TableHead>Status</TableHead>
               <TableHead>Last Login</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -163,9 +182,9 @@ export default function ManageUsersPage() {
               <TableRow key={user.id} className="hover:bg-muted/50">
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                {role === 'student' && <TableCell>{user.grade}</TableCell>}
-                {role === 'teacher' && <TableCell>{user.subject}</TableCell>}
-                {role === 'staff' && <TableCell>{user.department}</TableCell>}
+                {roleFilter === 'student' && <TableCell>{user.grade}</TableCell>}
+                {roleFilter === 'teacher' && <TableCell>{user.subject}</TableCell>}
+                {roleFilter === 'staff' && <TableCell>{user.department}</TableCell>}
                 <TableCell>
                   <Badge variant={user.status === 'active' ? 'default' : (user.status === 'invited' ? 'secondary' : 'outline')}
                          className={user.status === 'active' ? 'bg-green-500/20 text-green-700 border-green-500/50' : 
@@ -188,7 +207,7 @@ export default function ManageUsersPage() {
             {data.length === 0 && (
               <TableRow>
                 <TableCell colSpan={7} className="text-center h-24">
-                  No {role}s found.
+                  No {roleFilter}s found.
                 </TableCell>
               </TableRow>
             )}
@@ -308,13 +327,13 @@ export default function ManageUsersPage() {
           <TabsTrigger value="staff"><UserCog className="mr-2 h-4 w-4"/>Staff ({getFilteredUsers('staff').length})</TabsTrigger>
         </TabsList>
         <TabsContent value="student">
-          <Card><CardContent className="p-0"><UserTable role="student" /></CardContent></Card>
+          <Card><CardContent className="p-0"><UserTable roleFilter="student" /></CardContent></Card>
         </TabsContent>
         <TabsContent value="teacher">
-          <Card><CardContent className="p-0"><UserTable role="teacher" /></CardContent></Card>
+          <Card><CardContent className="p-0"><UserTable roleFilter="teacher" /></CardContent></Card>
         </TabsContent>
         <TabsContent value="staff">
-          <Card><CardContent className="p-0"><UserTable role="staff" /></CardContent></Card>
+          <Card><CardContent className="p-0"><UserTable roleFilter="staff" /></CardContent></Card>
         </TabsContent>
       </Tabs>
     </>

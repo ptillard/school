@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,6 +73,7 @@ const courseSubjects = ["Mathematics", "Science", "English", "Social Studies", "
 
 export default function ManageCoursesPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [courses, setCourses] = useState<Course[]>(mockCourses);
   const [teachers, setTeachers] = useState<Teacher[]>(mockTeachers);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,19 +88,28 @@ export default function ManageCoursesPage() {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-    if (editingCourse) {
-      setCourseName(editingCourse.name);
-      setGradeLevel(editingCourse.gradeLevel);
-      setSubject(editingCourse.subject);
-      setTeacherId(editingCourse.teacherId);
-      setDescription(editingCourse.description || '');
-    } else {
-      // Reset form for new course
-      setCourseName('');
-      setGradeLevel('');
-      setSubject('');
-      setTeacherId(undefined);
-      setDescription('');
+    if (searchParams.get('action') === 'new-course') {
+      setEditingCourse(null);
+      setIsFormOpen(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFormOpen) {
+        if (editingCourse) {
+        setCourseName(editingCourse.name);
+        setGradeLevel(editingCourse.gradeLevel);
+        setSubject(editingCourse.subject);
+        setTeacherId(editingCourse.teacherId);
+        setDescription(editingCourse.description || '');
+        } else {
+        // Reset form for new course
+        setCourseName('');
+        setGradeLevel('');
+        setSubject('');
+        setTeacherId(undefined);
+        setDescription('');
+        }
     }
   }, [editingCourse, isFormOpen]);
 

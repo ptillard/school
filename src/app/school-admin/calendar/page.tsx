@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
@@ -74,6 +75,7 @@ export default function SchoolAdminCalendarPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<SchoolCalendarEvent | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -82,27 +84,39 @@ export default function SchoolAdminCalendarPage() {
   const [isInstitutionWide, setIsInstitutionWide] = useState(true);
   const [targetAudience, setTargetAudience] = useState<string>("All");
   
-  const resetForm = () => {
+  const resetForm = (dateToSet?: Date) => {
     setEventTitle('');
     setEventDescription('');
     setEventType('school_event');
-    setEventDate(selectedDate || new Date());
+    setEventDate(dateToSet || new Date());
     setIsInstitutionWide(true);
     setTargetAudience("All");
   };
 
   useEffect(() => {
-    if (editingEvent) {
-      setEventTitle(editingEvent.title);
-      setEventDescription(editingEvent.description);
-      setEventType(editingEvent.type);
-      setEventDate(editingEvent.date);
-      setIsInstitutionWide(editingEvent.isInstitutionWide);
-      setTargetAudience(editingEvent.targetAudience || "All");
-    } else {
-      resetForm();
+    if (searchParams.get('action') === 'new-event') {
+      setEditingEvent(null);
+      resetForm(new Date()); // Reset form with today's date
+      setIsFormOpen(true);
     }
-  }, [editingEvent, isFormOpen]);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (isFormOpen) {
+        if (editingEvent) {
+        setEventTitle(editingEvent.title);
+        setEventDescription(editingEvent.description);
+        setEventType(editingEvent.type);
+        setEventDate(editingEvent.date);
+        setIsInstitutionWide(editingEvent.isInstitutionWide);
+        setTargetAudience(editingEvent.targetAudience || "All");
+        } else {
+        // resetForm is called when opening for new or from query param
+        // ensure date is set correctly if selectedDate is available
+        // setEventDate(selectedDate || new Date());
+        }
+    }
+  }, [editingEvent, isFormOpen, selectedDate]);
 
 
   const handleAddOrUpdateEvent = () => {
@@ -147,13 +161,13 @@ export default function SchoolAdminCalendarPage() {
 
   return (
     <>
-      <Dialog open={isFormOpen} onOpenChange={(open) => { setIsFormOpen(open); if (!open) setEditingEvent(null);}}>
+      <Dialog open={isFormOpen} onOpenChange={(open) => { setIsFormOpen(open); if (!open) {setEditingEvent(null); resetForm(selectedDate); }}}>
         <PageHeader
           title="Manage School Calendar"
           description="Add, view, and manage school-wide events, holidays, and important dates."
           actions={
             <DialogTrigger asChild>
-               <Button onClick={() => { setEditingEvent(null); resetForm(); setEventDate(selectedDate || new Date()); setIsFormOpen(true);}}>
+               <Button onClick={() => { setEditingEvent(null); resetForm(selectedDate || new Date()); setIsFormOpen(true);}}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Event
               </Button>
             </DialogTrigger>

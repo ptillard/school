@@ -1,6 +1,7 @@
 
 "use client";
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -48,13 +49,28 @@ const mockCourses = [
 
 export default function SchoolAdminNotificationsPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState("compose");
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [eventType, setEventType] = useState('');
-  const [courseName, setCourseName] = useState('All School'); // default, will be from select
+  const [courseName, setCourseName] = useState('All School'); 
   const [isGenerating, setIsGenerating] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [attachments, setAttachments] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setActiveTab('compose');
+      // Optionally pre-fill or reset fields if needed
+      setTitle('');
+      setContent('');
+      setEventType('');
+      setCourseName('All School');
+      setAttachments([]);
+    }
+  }, [searchParams]);
+
 
   const handleGenerateText = async () => {
     if (!title || !eventType) {
@@ -69,10 +85,10 @@ export default function SchoolAdminNotificationsPage() {
     try {
       const input: GenerateNotificationTextInput = {
         eventTitle: title,
-        eventDescription: content, // Use current content as description for AI
+        eventDescription: content, 
         eventType: eventType,
-        courseName: courseName, // Assuming current school name is available
-        schoolName: 'My Awesome School', // Placeholder for actual school name
+        courseName: courseName, 
+        schoolName: 'My Awesome School', 
       };
       const result = await generateNotificationText(input);
       setContent(result.notificationText);
@@ -127,7 +143,7 @@ export default function SchoolAdminNotificationsPage() {
         title="Send & Manage Notifications"
         description="Communicate with parents, teachers, and staff. Use the AI assistant for help!"
       />
-      <Tabs defaultValue="compose" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="compose"><PlusCircle className="mr-2 h-4 w-4" />Compose Notification</TabsTrigger>
           <TabsTrigger value="history"><ListChecks className="mr-2 h-4 w-4" />Notification History</TabsTrigger>
