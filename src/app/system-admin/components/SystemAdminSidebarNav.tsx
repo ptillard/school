@@ -20,16 +20,16 @@ export function SystemAdminSidebarNav() {
     <SidebarMenu>
       {navItems.map((item) => (
         <SidebarMenuItem key={item.label}>
-          <Link href={item.href} passHref>
+          <Link href={item.href}>
             <SidebarMenuButton
               asChild
               isActive={pathname === item.href || (item.href !== '/system-admin' && pathname.startsWith(item.href))}
               tooltip={{ children: item.label, side: 'right', align: 'center' }}
             >
-              <>
+              <span>
                 <item.icon />
                 <span>{item.label}</span>
-              </>
+              </span>
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
@@ -37,3 +37,4 @@ export function SystemAdminSidebarNav() {
     </SidebarMenu>
   );
 }
+
