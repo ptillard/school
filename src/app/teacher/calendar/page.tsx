@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, BookOpen, PlusCircle, Edit, Trash2, Users } from 'lucide-react'; // Added Users
+import { AlertTriangle, BookOpen, PlusCircle, Edit, Trash2, Users } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -36,7 +36,7 @@ interface TeacherCalendarEvent {
   date: Date;
   title: string;
   description: string;
-  type: 'exam' | 'homework' | 'lesson' | 'reminder' | 'meeting'; // Added meeting
+  type: 'exam' | 'homework' | 'lesson' | 'reminder' | 'meeting';
   courseId: string; 
   courseName: string;
 }
@@ -57,22 +57,20 @@ const mockTeacherEvents: TeacherCalendarEvent[] = [
   { id: 't2', date: new Date(2023, 8, 27), title: 'Grade 11B - Physics Lab Prep', description: 'Read lab manual pages 10-15.', type: 'homework', courseId: 'course2', courseName: 'Physics Grade 11B' },
   { id: 't3', date: new Date(2023, 8, 29), title: 'Grade 9C - Guest Speaker: Poet', description: 'Special session on modern poetry.', type: 'lesson', courseId: 'course3', courseName: 'Literature Grade 9C' },
   { id: 't4', date: new Date(2023, 9, 2), title: 'Grade 10A - Project Deadline Reminder', description: 'Geometry projects are due next Monday.', type: 'reminder', courseId: 'course1', courseName: 'Mathematics Grade 10A' },
-  { id: 't5', date: new Date(2023, 9, 5), title: 'Faculty Meeting', description: 'Discuss curriculum updates.', type: 'meeting', courseId: 'all', courseName: 'All Staff' }, // Example of a non-course specific event for a teacher
+  { id: 't5', date: new Date(2023, 9, 5), title: 'Faculty Meeting', description: 'Discuss curriculum updates.', type: 'meeting', courseId: 'all', courseName: 'All Staff' },
 ];
 
-// Add a few more events for today to test selectedDate logic
 const today = new Date();
 mockTeacherEvents.push(
     { id: 'todayT1', date: today, title: 'Grade 10A - Review Session', description: 'Q&A for upcoming test.', type: 'lesson', courseId: 'course1', courseName: 'Mathematics Grade 10A'},
     { id: 'todayT2', date: today, title: 'Physics Grade 11B - Homework Collection', description: 'Submit Newton\'s Laws worksheet.', type: 'homework', courseId: 'course2', courseName: 'Physics Grade 11B'}
 );
 
-
 const getEventTypeProps = (type: TeacherCalendarEvent['type']) => {
   switch (type) {
     case 'exam': return { icon: <AlertTriangle className="h-4 w-4 text-destructive" />, color: 'border-destructive bg-destructive/10' };
     case 'homework': return { icon: <BookOpen className="h-4 w-4 text-blue-500" />, color: 'border-blue-500 bg-blue-500/10' };
-    case 'lesson': return { icon: <BookOpen className="h-4 w-4 text-green-500" />, color: 'border-green-500 bg-green-500/10' }; // Changed icon for lesson
+    case 'lesson': return { icon: <BookOpen className="h-4 w-4 text-green-500" />, color: 'border-green-500 bg-green-500/10' };
     case 'reminder': return { icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />, color: 'border-yellow-500 bg-yellow-500/10' };
     case 'meeting': return { icon: <Users className="h-4 w-4 text-orange-500" />, color: 'border-orange-500 bg-orange-500/10' };
     default: return { icon: <BookOpen className="h-4 w-4 text-gray-500" />, color: 'border-gray-500 bg-gray-500/10' };
@@ -87,12 +85,19 @@ export default function TeacherCalendarPage() {
   const [editingEvent, setEditingEvent] = useState<TeacherCalendarEvent | null>(null);
   const { toast } = useToast();
 
-  // Form state
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
   const [eventType, setEventType] = useState<TeacherCalendarEvent['type']>('lesson');
   const [eventCourseId, setEventCourseId] = useState<string>(courses.length > 0 ? courses[0].id : '');
   const [eventDate, setEventDate] = useState<Date | undefined>(new Date());
+
+  const resetForm = () => {
+    setEventTitle('');
+    setEventDescription('');
+    setEventType('lesson');
+    setEventCourseId(courses.length > 0 ? courses[0].id : '');
+    setEventDate(selectedDate || new Date());
+  };
 
   useEffect(() => {
     if (editingEvent) {
@@ -101,30 +106,18 @@ export default function TeacherCalendarPage() {
       setEventType(editingEvent.type);
       setEventCourseId(editingEvent.courseId);
       setEventDate(editingEvent.date);
-      setIsFormOpen(true);
-    } else {
-      resetForm();
+      setIsFormOpen(true); 
     }
-  }, [editingEvent, isFormOpen]);
-  
-  const resetForm = () => {
-    setEventTitle('');
-    setEventDescription('');
-    setEventType('lesson');
-    setEventCourseId(courses.length > 0 ? courses[0].id : '');
-    setEventDate(selectedDate || new Date()); // Default to selectedDate or today
-  };
-
+  }, [editingEvent]);
 
   const handleAddOrUpdateEvent = () => {
     if (!eventTitle || !eventCourseId || !eventDate) {
       toast({ title: "Missing Information", description: "Please fill in title, select a course, and pick a date.", variant: "destructive"});
       return;
     }
-    const courseName = courses.find(c => c.id === eventCourseId)?.name || 'Unknown Course';
+    const courseName = courses.find(c => c.id === eventCourseId)?.name || (eventCourseId === 'all' ? 'All Staff / General' : 'Unknown Course');
 
     if (editingEvent) {
-      // Update existing event
       const updatedEvents = events.map(ev => 
         ev.id === editingEvent.id 
         ? { ...ev, title: eventTitle, description: eventDescription, type: eventType, courseId: eventCourseId, courseName, date: eventDate } 
@@ -133,7 +126,6 @@ export default function TeacherCalendarPage() {
       setEvents(updatedEvents);
       toast({ title: "Event Updated", description: `"${eventTitle}" has been updated.`, className: "bg-accent text-accent-foreground" });
     } else {
-      // Add new event
       const newEvent: TeacherCalendarEvent = {
         id: String(Date.now()),
         title: eventTitle,
@@ -148,7 +140,7 @@ export default function TeacherCalendarPage() {
     }
     setIsFormOpen(false);
     setEditingEvent(null);
-    resetForm();
+    // resetForm(); // Reset form is handled by onOpenChange when dialog closes or when opening for new.
   };
   
   const handleDeleteEvent = (eventId: string) => {
@@ -156,25 +148,38 @@ export default function TeacherCalendarPage() {
     toast({ title: "Event Deleted", description: "The event has been removed from the calendar.", variant: "destructive" });
   };
 
-
   const eventsForSelectedDate = events.filter(event =>
     selectedDate && event.date.toDateString() === selectedDate.toDateString()
   ).sort((a,b) => a.date.getTime() - b.date.getTime());
 
   return (
     <>
-      <PageHeader
-        title="My Course Calendar"
-        description="Manage and view events for your courses."
-        actions={
-          <DialogTrigger asChild>
-            <Button onClick={() => { setEditingEvent(null); setIsFormOpen(true); setEventDate(selectedDate || new Date());}}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Event
-            </Button>
-          </DialogTrigger>
-        }
-      />
-      <Dialog open={isFormOpen} onOpenChange={(open) => { setIsFormOpen(open); if (!open) setEditingEvent(null); }}>
+      <Dialog 
+        open={isFormOpen} 
+        onOpenChange={(open) => { 
+          setIsFormOpen(open); 
+          if (!open) {
+            setEditingEvent(null);
+            resetForm();
+          }
+        }}
+      >
+        <PageHeader
+          title="My Course Calendar"
+          description="Manage and view events for your courses."
+          actions={
+            <DialogTrigger asChild>
+              <Button onClick={() => { 
+                setEditingEvent(null); 
+                resetForm();
+                setEventDate(selectedDate || new Date()); 
+                // setIsFormOpen(true); // DialogTrigger handles opening
+              }}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add New Event
+              </Button>
+            </DialogTrigger>
+          }
+        />
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="font-headline">{editingEvent ? 'Edit Event' : 'Add New Event'}</DialogTitle>
@@ -184,23 +189,27 @@ export default function TeacherCalendarPage() {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <Label htmlFor="eventTitle">Event Title</Label>
-              <Input id="eventTitle" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} placeholder="e.g., Chapter 5 Test" className="mt-1" />
+              <Label htmlFor="eventTitleForm">Event Title</Label>
+              <Input id="eventTitleForm" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} placeholder="e.g., Chapter 5 Test" className="mt-1" />
             </div>
             <div>
-              <Label htmlFor="eventDate">Date</Label>
+              <Label htmlFor="eventDateForm">Date</Label>
               <Input 
                 type="date" 
-                id="eventDate" 
+                id="eventDateForm" 
                 value={eventDate ? eventDate.toISOString().split('T')[0] : ''} 
-                onChange={(e) => setEventDate(new Date(e.target.value))} 
+                onChange={(e) => {
+                    const newDate = new Date(e.target.value);
+                    const timezoneOffset = newDate.getTimezoneOffset() * 60000;
+                    setEventDate(new Date(newDate.getTime() + timezoneOffset));
+                }}
                 className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="eventCourse">Course</Label>
+              <Label htmlFor="eventCourseForm">Course</Label>
               <Select value={eventCourseId} onValueChange={setEventCourseId}>
-                <SelectTrigger id="eventCourse" className="mt-1">
+                <SelectTrigger id="eventCourseForm" className="mt-1">
                   <SelectValue placeholder="Select course" />
                 </SelectTrigger>
                 <SelectContent>
@@ -212,9 +221,9 @@ export default function TeacherCalendarPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="eventType">Event Type</Label>
+              <Label htmlFor="eventTypeForm">Event Type</Label>
               <Select value={eventType} onValueChange={(value) => setEventType(value as TeacherCalendarEvent['type'])}>
-                <SelectTrigger id="eventType" className="mt-1">
+                <SelectTrigger id="eventTypeForm" className="mt-1">
                   <SelectValue placeholder="Select event type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -227,8 +236,8 @@ export default function TeacherCalendarPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="eventDescription">Description (Optional)</Label>
-              <Textarea id="eventDescription" value={eventDescription} onChange={(e) => setEventDescription(e.target.value)} placeholder="Additional details..." className="mt-1" />
+              <Label htmlFor="eventDescriptionForm">Description (Optional)</Label>
+              <Textarea id="eventDescriptionForm" value={eventDescription} onChange={(e) => setEventDescription(e.target.value)} placeholder="Additional details..." className="mt-1" />
             </div>
           </div>
           <DialogFooter>
@@ -240,76 +249,75 @@ export default function TeacherCalendarPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="md:col-span-2 shadow-lg">
-            <CardContent className="p-2 md:p-4 flex justify-center">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="rounded-md border"
-                modifiers={{
-                  events: events.map(e => e.date),
-                }}
-                modifiersStyles={{
-                  events: { fontWeight: 'bold', color: 'hsl(var(--primary))', textDecoration: 'underline' }
-                }}
-              />
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <Card className="md:col-span-2 shadow-lg">
+          <CardContent className="p-2 md:p-4 flex justify-center">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border"
+              modifiers={{
+                events: events.map(e => e.date),
+              }}
+              modifiersStyles={{
+                events: { fontWeight: 'bold', color: 'hsl(var(--primary))', textDecoration: 'underline' }
+              }}
+            />
+          </CardContent>
+        </Card>
 
-          <Card className="md:col-span-1 shadow-lg">
-            <CardHeader>
-              <CardTitle className="font-headline">
-                Events for: {selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'No date'}
-              </CardTitle>
-              <CardDescription>Scroll to see all events.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[300px] md:h-[calc(100vh-25rem)]"> {/* Adjust height */}
-                {eventsForSelectedDate.length > 0 ? (
-                  <ul className="divide-y divide-border">
-                    {eventsForSelectedDate.map(event => {
-                      const { icon, color } = getEventTypeProps(event.type);
-                      return (
-                        <li key={event.id} className={`p-3 hover:bg-muted/30 transition-colors ${color}`}>
-                          <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0 pt-1">{icon}</div>
-                            <div className="flex-grow">
-                              <h4 className="font-semibold text-sm">{event.title}</h4>
-                              <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
-                              <div className="mt-1.5 space-x-1.5">
-                                  <Badge variant="secondary" className="text-xs">
-                                    {event.courseName}
-                                  </Badge>
-                                  <Badge variant="outline" className="text-xs capitalize">{event.type}</Badge>
-                              </div>
-                            </div>
-                            <div className="flex flex-col space-y-1">
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingEvent(event)}>
-                                    <Edit className="h-4 w-4"/>
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDeleteEvent(event.id)}>
-                                    <Trash2 className="h-4 w-4 text-destructive"/>
-                                </Button>
+        <Card className="md:col-span-1 shadow-lg">
+          <CardHeader>
+            <CardTitle className="font-headline">
+              Events for: {selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) : 'No date'}
+            </CardTitle>
+            <CardDescription>Scroll to see all events.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[300px] md:h-[calc(100vh-25rem)]">
+              {eventsForSelectedDate.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {eventsForSelectedDate.map(event => {
+                    const { icon, color } = getEventTypeProps(event.type);
+                    return (
+                      <li key={event.id} className={`p-3 hover:bg-muted/30 transition-colors ${color}`}>
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0 pt-1">{icon}</div>
+                          <div className="flex-grow">
+                            <h4 className="font-semibold text-sm">{event.title}</h4>
+                            <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
+                            <div className="mt-1.5 space-x-1.5">
+                                <Badge variant="secondary" className="text-xs">
+                                  {event.courseName}
+                                </Badge>
+                                <Badge variant="outline" className="text-xs capitalize">{event.type}</Badge>
                             </div>
                           </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <div className="p-4 text-center text-muted-foreground h-full flex items-center justify-center">
-                    No events scheduled for this day.
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-      </Dialog>
+                          <div className="flex flex-col space-y-1">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditingEvent(event)}>
+                                  <Edit className="h-4 w-4"/>
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDeleteEvent(event.id)}>
+                                  <Trash2 className="h-4 w-4 text-destructive"/>
+                              </Button>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <div className="p-4 text-center text-muted-foreground h-full flex items-center justify-center">
+                  No events scheduled for this day.
+                </div>
+              )}
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }
-
