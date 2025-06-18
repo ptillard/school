@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell, CalendarDays, UserCircle, MessageSquare, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { Bell, CalendarDays, UserCircle, MessageSquare, AlertTriangle, CheckCircle2, Info, FileText as LucideFileTextIcon } from 'lucide-react'; // Renamed FileText to avoid conflict
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 
 interface Child {
@@ -58,7 +59,7 @@ const getNotificationIcon = (type: Notification['type']) => {
   switch (type) {
     case 'urgent': return <AlertTriangle className="h-5 w-5 text-destructive" />;
     case 'homework': return <MessageSquare className="h-5 w-5 text-blue-500" />;
-    case 'exam': return <FileText className="h-5 w-5 text-orange-500" />; // Assuming FileText is for exams
+    case 'exam': return <LucideFileTextIcon className="h-5 w-5 text-orange-500" />; 
     case 'event': return <CalendarDays className="h-5 w-5 text-purple-500" />;
     default: return <Info className="h-5 w-5 text-primary" />;
   }
@@ -204,6 +205,7 @@ export default function ParentDashboardPage() {
 }
 
 // Dummy FileText component if not available from lucide-react (it is, but as an example)
+// Kept for safety, but LucideFileTextIcon from lucide-react is preferred
 const FileText = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
