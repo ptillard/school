@@ -1,6 +1,7 @@
 
 "use client"
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Edit, Trash2, Search, Palette, Users } from 'lucide-react';
@@ -26,7 +27,6 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { SchoolComLogo } from '@/components/SchoolComLogo';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface School {
@@ -56,6 +56,7 @@ export default function ManageSchoolsPage() {
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
   const [schoolToDelete, setSchoolToDelete] = useState<School | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   // Form state for the dialog
   const [schoolName, setSchoolName] = useState('');
@@ -70,6 +71,14 @@ export default function ManageSchoolsPage() {
     setSchools(mockSchools);
   }, []);
 
+  const resetFormFields = () => {
+    setSchoolName('');
+    setAdminEmail('');
+    setPrimaryColor('#4285F4');
+    setSchoolPhone('');
+    setSchoolAddress('');
+  };
+
   useEffect(() => {
     if (isFormOpen) {
       if (editingSchool) {
@@ -79,15 +88,17 @@ export default function ManageSchoolsPage() {
         setSchoolPhone(editingSchool.phone || '');
         setSchoolAddress(editingSchool.address || '');
       } else {
-        // Reset for new school
-        setSchoolName('');
-        setAdminEmail('');
-        setPrimaryColor('#4285F4');
-        setSchoolPhone('');
-        setSchoolAddress('');
+        resetFormFields();
       }
     }
   }, [isFormOpen, editingSchool]);
+  
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      handleCreateSchool();
+    }
+  }, [searchParams]);
+
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -96,6 +107,7 @@ export default function ManageSchoolsPage() {
 
   const handleCreateSchool = () => {
     setEditingSchool(null);
+    resetFormFields(); // Ensure form is reset
     setIsFormOpen(true);
   };
 
@@ -118,7 +130,11 @@ export default function ManageSchoolsPage() {
 
   const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Data is now taken from state variables (schoolName, adminEmail, etc.)
+    if (!schoolName.trim() || !adminEmail.trim()) {
+      toast({ title: "Missing Fields", description: "School Name and Admin Email are required.", variant: "destructive" });
+      return;
+    }
+    
     if (editingSchool) {
       const updatedSchoolData: Partial<School> = {
         name: schoolName,
@@ -193,7 +209,7 @@ export default function ManageSchoolsPage() {
                 <TableRow key={school.id} className="hover:bg-muted/50">
                   <TableCell>
                     {school.logoUrl ? (
-                      <img src={school.logoUrl} alt={`${school.name} logo`} className="h-8 w-8 rounded-sm object-contain" data-ai-hint="school logo" />
+                      <img src={school.logoUrl} alt={`${school.name} logo`} className="h-8 w-8 rounded-sm object-contain" data-ai-hint="school logo"/>
                     ) : (
                       <div className="h-8 w-8 rounded-sm bg-muted flex items-center justify-center text-muted-foreground text-xs">
                         {school.name.substring(0,2).toUpperCase()}
@@ -246,11 +262,11 @@ export default function ManageSchoolsPage() {
           </DialogHeader>
           <form onSubmit={onFormSubmit} className="space-y-4 py-4">
              <div>
-              <Label htmlFor="schoolNameForm">School Name</Label>
+              <Label htmlFor="schoolNameForm">School Name <span className="text-destructive">*</span></Label>
               <Input id="schoolNameForm" name="schoolName" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} required className="mt-1" />
             </div>
             <div>
-              <Label htmlFor="adminEmailForm">Admin Email</Label>
+              <Label htmlFor="adminEmailForm">Admin Email <span className="text-destructive">*</span></Label>
               <Input id="adminEmailForm" name="adminEmail" type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required className="mt-1" />
             </div>
             <div>

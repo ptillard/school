@@ -19,7 +19,7 @@ export default function SystemAdminDashboardPage() {
         title="System Overview"
         description="Manage the entire SchoolCom platform from here."
         actions={
-          <Link href="/system-admin/schools/new" passHref>
+          <Link href="/system-admin/schools?action=new" passHref>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" />
               Create New School
