@@ -13,6 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -27,7 +29,6 @@ import { useToast } from '@/hooks/use-toast';
 import { SchoolComLogo } from '@/components/SchoolComLogo';
 import { Card, CardContent } from '@/components/ui/card';
 
-// Mock school data type
 interface School {
   id: string;
   name: string;
@@ -36,12 +37,13 @@ interface School {
   userCount: number;
   logoUrl?: string;
   primaryColor?: string;
+  phone?: string;
+  address?: string;
 }
 
-// Mock data - replace with actual API calls
 const mockSchools: School[] = [
-  { id: '1', name: 'Greenwood High', adminEmail: 'admin@greenwood.com', status: 'active', userCount: 350, logoUrl: `https://placehold.co/40x40.png?text=GH`, primaryColor: '#4CAF50' },
-  { id: '2', name: 'Oakridge Academy', adminEmail: 'principal@oakridge.edu', status: 'active', userCount: 520, logoUrl: `https://placehold.co/40x40.png?text=OA`, primaryColor: '#2196F3' },
+  { id: '1', name: 'Greenwood High', adminEmail: 'admin@greenwood.com', status: 'active', userCount: 350, logoUrl: `https://placehold.co/40x40.png?text=GH`, primaryColor: '#4CAF50', phone: '555-0101', address: '123 Forest Ln, Greenwood City' },
+  { id: '2', name: 'Oakridge Academy', adminEmail: 'principal@oakridge.edu', status: 'active', userCount: 520, logoUrl: `https://placehold.co/40x40.png?text=OA`, primaryColor: '#2196F3', phone: '555-0102', address: '456 Oak Ave, Oakridge Town' },
   { id: '3', name: 'Riverside Elementary', adminEmail: 'info@riverside.org', status: 'inactive', userCount: 180, logoUrl: `https://placehold.co/40x40.png?text=RE`, primaryColor: '#FF9800' },
   { id: '4', name: 'North Star Kindergarten', adminEmail: 'apply@northstar.kids', status: 'pending', userCount: 0, primaryColor: '#9C27B0' },
 ];
@@ -55,10 +57,37 @@ export default function ManageSchoolsPage() {
   const [schoolToDelete, setSchoolToDelete] = useState<School | null>(null);
   const { toast } = useToast();
 
+  // Form state for the dialog
+  const [schoolName, setSchoolName] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [primaryColor, setPrimaryColor] = useState('#4285F4');
+  const [schoolPhone, setSchoolPhone] = useState('');
+  const [schoolAddress, setSchoolAddress] = useState('');
+
+
   useEffect(() => {
     // Simulate fetching data
     setSchools(mockSchools);
   }, []);
+
+  useEffect(() => {
+    if (isFormOpen) {
+      if (editingSchool) {
+        setSchoolName(editingSchool.name);
+        setAdminEmail(editingSchool.adminEmail);
+        setPrimaryColor(editingSchool.primaryColor || '#4285F4');
+        setSchoolPhone(editingSchool.phone || '');
+        setSchoolAddress(editingSchool.address || '');
+      } else {
+        // Reset for new school
+        setSchoolName('');
+        setAdminEmail('');
+        setPrimaryColor('#4285F4');
+        setSchoolPhone('');
+        setSchoolAddress('');
+      }
+    }
+  }, [isFormOpen, editingSchool]);
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,10 +101,7 @@ export default function ManageSchoolsPage() {
 
   const handleEditSchool = (school: School) => {
     setEditingSchool(school);
-    // For now, just log. Actual form data would be prefilled.
-    console.log("Editing school:", school);
-    toast({ title: "Edit School", description: "This would open an edit form for " + school.name });
-    // setIsFormOpen(true); // This would open the form
+    setIsFormOpen(true);
   };
   
   const handleDeleteSchool = () => {
@@ -90,24 +116,32 @@ export default function ManageSchoolsPage() {
     }
   };
 
-  // Dummy form submission
-  const onFormSubmit = (data: any) => {
+  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Data is now taken from state variables (schoolName, adminEmail, etc.)
     if (editingSchool) {
-      // update school
-      setSchools(schools.map(s => s.id === editingSchool.id ? {...s, ...data, name: data.schoolName, adminEmail: data.adminEmail} : s));
-      toast({ title: "School Updated", description: `${data.schoolName} updated successfully.` });
+      const updatedSchoolData: Partial<School> = {
+        name: schoolName,
+        adminEmail: adminEmail,
+        primaryColor: primaryColor,
+        phone: schoolPhone,
+        address: schoolAddress,
+      };
+      setSchools(schools.map(s => s.id === editingSchool.id ? {...s, ...updatedSchoolData} : s));
+      toast({ title: "School Updated", description: `${schoolName} updated successfully.`, className: "bg-accent text-accent-foreground" });
     } else {
-      // create new school
       const newSchool: School = {
         id: String(Date.now()),
-        name: data.schoolName,
-        adminEmail: data.adminEmail,
-        status: 'pending', // Default status for new school
+        name: schoolName,
+        adminEmail: adminEmail,
+        status: 'pending',
         userCount: 0,
-        primaryColor: data.primaryColor,
+        primaryColor: primaryColor,
+        phone: schoolPhone,
+        address: schoolAddress,
       };
-      setSchools([...schools, newSchool]);
-      toast({ title: "School Created", description: `${data.schoolName} created successfully.` });
+      setSchools([newSchool, ...schools]);
+      toast({ title: "School Created", description: `${schoolName} created successfully.`, className: "bg-accent text-accent-foreground" });
     }
     setIsFormOpen(false);
     setEditingSchool(null);
@@ -202,8 +236,7 @@ export default function ManageSchoolsPage() {
         </div>
       </Card>
       
-      {/* School Form Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={(open) => { setIsFormOpen(open); if (!open) setEditingSchool(null); }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-headline">{editingSchool ? 'Edit School' : 'Create New School'}</DialogTitle>
@@ -211,26 +244,28 @@ export default function ManageSchoolsPage() {
               {editingSchool ? `Update details for ${editingSchool.name}.` : 'Enter the details for the new school.'}
             </DialogDescription>
           </DialogHeader>
-          {/* Replace with actual form component */}
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const data = Object.fromEntries(formData.entries());
-            onFormSubmit(data);
-          }} className="space-y-4 py-4">
+          <form onSubmit={onFormSubmit} className="space-y-4 py-4">
              <div>
-              <label htmlFor="schoolName" className="block text-sm font-medium text-foreground">School Name</label>
-              <Input id="schoolName" name="schoolName" defaultValue={editingSchool?.name} required className="mt-1" />
+              <Label htmlFor="schoolNameForm">School Name</Label>
+              <Input id="schoolNameForm" name="schoolName" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} required className="mt-1" />
             </div>
             <div>
-              <label htmlFor="adminEmail" className="block text-sm font-medium text-foreground">Admin Email</label>
-              <Input id="adminEmail" name="adminEmail" type="email" defaultValue={editingSchool?.adminEmail} required className="mt-1" />
+              <Label htmlFor="adminEmailForm">Admin Email</Label>
+              <Input id="adminEmailForm" name="adminEmail" type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required className="mt-1" />
             </div>
-             <div>
-              <label htmlFor="primaryColor" className="block text-sm font-medium text-foreground">Primary Color</label>
-              <Input id="primaryColor" name="primaryColor" type="color" defaultValue={editingSchool?.primaryColor || '#4285F4'} className="mt-1 h-10" />
+            <div>
+              <Label htmlFor="schoolPhoneForm">School Phone (Optional)</Label>
+              <Input id="schoolPhoneForm" name="schoolPhone" type="tel" value={schoolPhone} onChange={(e) => setSchoolPhone(e.target.value)} className="mt-1" />
             </div>
-            {/* Add more fields: logo upload, etc. */}
+            <div>
+              <Label htmlFor="schoolAddressForm">School Address (Optional)</Label>
+              <Textarea id="schoolAddressForm" name="schoolAddress" value={schoolAddress} onChange={(e) => setSchoolAddress(e.target.value)} className="mt-1" />
+            </div>
+            <div>
+              <Label htmlFor="primaryColorForm">Primary Color</Label>
+              <Input id="primaryColorForm" name="primaryColor" type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="mt-1 h-10 w-full" />
+            </div>
+            {/* Future: Add logo upload field here */}
             <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="outline">Cancel</Button>
@@ -241,7 +276,6 @@ export default function ManageSchoolsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={!!schoolToDelete} onOpenChange={() => setSchoolToDelete(null)}>
         <DialogContent>
           <DialogHeader>
@@ -259,4 +293,3 @@ export default function ManageSchoolsPage() {
     </>
   );
 }
-
