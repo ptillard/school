@@ -16,8 +16,8 @@ export default function TeacherDashboardPage() {
 
   const quickLinks = [
     { href: "/teacher/courses", label: "View My Courses", icon: BookCopy },
-    { href: "/teacher/notifications/new", label: "Create Notification", icon: MessageCirclePlus },
-    { href: "/teacher/calendar/new-event", label: "Add Calendar Event", icon: CalendarPlus },
+    { href: "/teacher/notifications", label: "Create Notification", icon: MessageCirclePlus },
+    { href: "/teacher/calendar", label: "Add Calendar Event", icon: CalendarPlus },
   ];
 
   return (
@@ -26,7 +26,7 @@ export default function TeacherDashboardPage() {
         title="Teacher Dashboard"
         description="Welcome! Manage your courses, students, and communications."
         actions={
-          <Link href="/teacher/notifications/new" passHref>
+          <Link href="/teacher/notifications" passHref>
             <Button>
               <MessageCirclePlus className="mr-2 h-4 w-4" />
               New Notification
