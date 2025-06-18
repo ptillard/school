@@ -17,7 +17,7 @@ export default function LoginPage() {
   const roles: { name: UserRole; label: string; icon: React.ElementType, description: string }[] = [
     { name: 'systemAdmin', label: 'System Admin', icon: ShieldCheck, description: "Manage schools and platform settings." },
     { name: 'schoolAdmin', label: 'School Admin', icon: Building, description: "Manage your school, users, and courses." },
-    { name: 'teacher', label: 'Teacher', icon: Briefcase, description: "Access your courses, send notifications, and manage events."},
+    { name: 'teacher', label: 'Teacher', icon: Briefcase, description: "Manage courses, notifications & events."},
     { name: 'parent', label: 'Parent', icon: Users, description: "View your child's updates, notifications, and calendar." },
   ];
 
