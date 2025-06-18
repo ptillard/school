@@ -13,15 +13,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, UserCircle, Settings, Sun, Moon } from "lucide-react"; // Assuming useTheme from next-themes
+import { LogOut, UserCircle, Settings, Sun, Moon, Languages } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 // Dummy useTheme for now
 const useTheme = () => {
   const [theme, setThemeState] = useState('light');
   useEffect(() => {
-    // In a real app, this would come from localStorage or system preference
     const storedTheme = typeof window !== "undefined" ? localStorage.getItem("theme") || 'light' : 'light';
     setThemeState(storedTheme);
     if (typeof window !== "undefined") {
@@ -30,10 +31,11 @@ const useTheme = () => {
   }, []);
 
   const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
-    setThemeState(newTheme === 'system' ? 'light' : newTheme); // simplify system for now
+    const effectiveTheme = newTheme === 'system' ? 'light' : newTheme; // simplify system for now
+    setThemeState(effectiveTheme);
     if (typeof window !== "undefined") {
-      localStorage.setItem("theme", newTheme === 'system' ? 'light' : newTheme);
-      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+      localStorage.setItem("theme", effectiveTheme);
+      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
     }
   };
   return { theme, setTheme };
@@ -43,6 +45,8 @@ const useTheme = () => {
 export function UserNav() {
   const { user, role, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { language, toggleLanguage } = useLanguage();
+  const { t } = useTranslation();
 
   if (!user) {
     return null;
@@ -55,6 +59,10 @@ export function UserNav() {
       initials += names[names.length - 1].substring(0, 1).toUpperCase();
     }
     return initials;
+  };
+
+  const handleToggleLanguage = () => {
+    toggleLanguage();
   };
 
   return (
@@ -75,7 +83,7 @@ export function UserNav() {
               {user.email}
             </p>
             <p className="text-xs leading-none text-muted-foreground capitalize pt-1">
-              Role: {role}
+              {t('userNav.roleLabel')} {role ? t(`roles.${role}` as any) : t('roles.guest' as any)}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -83,22 +91,26 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <UserCircle className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>{t('userNav.profile')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+            <span>{t('userNav.settings')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
          <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
           {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
-          <span>Toggle Theme</span>
+          <span>{t('userNav.toggleTheme')}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleToggleLanguage}>
+          <Languages className="mr-2 h-4 w-4" />
+          <span>{language === 'en' ? t('userNav.switchToSpanish') : t('userNav.switchToEnglish')}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>{t('userNav.logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

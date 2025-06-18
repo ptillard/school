@@ -1,0 +1,47 @@
+
+{
+  "appTitle": "SchoolCom",
+  "loginPage": {
+    "welcomeTitle": "Bienvenido a SchoolCom",
+    "welcomeDescription": "Su plataforma integrada de comunicación escolar. Por favor, seleccione su rol para continuar.",
+    "roles": {
+      "systemAdmin": {
+        "label": "Administrador del Sistema",
+        "description": "Gestionar escuelas y configuraciones de la plataforma."
+      },
+      "schoolAdmin": {
+        "label": "Administrador Escolar",
+        "description": "Gestionar su escuela, usuarios y cursos."
+      },
+      "teacher": {
+        "label": "Profesor",
+        "description": "Gestionar cursos, notificaciones y eventos."
+      },
+      "parent": {
+        "label": "Padre/Madre",
+        "description": "Ver actualizaciones, notificaciones y calendario del niño."
+      }
+    },
+    "footer": {
+      "copyright": "© {year} SchoolCom. Todos los derechos reservados.",
+      "tagline": "Optimizando la comunicación para un futuro más brillante en la educación."
+    }
+  },
+  "userNav": {
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "toggleTheme": "Cambiar Tema",
+    "logout": "Cerrar Sesión",
+    "roleLabel": "Rol:",
+    "language": "Idioma",
+    "switchToSpanish": "Español",
+    "switchToEnglish": "English"
+  },
+  "roles": {
+    "systemAdmin": "Administrador del Sistema",
+    "schoolAdmin": "Administrador Escolar",
+    "teacher": "Profesor",
+    "parent": "Padre/Madre",
+    "guest": "Invitado"
+  }
+}

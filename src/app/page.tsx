@@ -5,20 +5,31 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth, type UserRole } from '@/contexts/AuthContext';
 import { SchoolComLogo } from '@/components/SchoolComLogo';
-import { Building, Briefcase, Users, UserCheck, ShieldCheck, LogIn, UserCircle2 } from 'lucide-react';
+import { Building, Briefcase, Users, ShieldCheck, LogIn } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useTranslation();
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
 
   const handleLogin = (role: UserRole) => {
     login(role);
   };
 
-  const roles: { name: UserRole; label: string; icon: React.ElementType, description: string }[] = [
-    { name: 'systemAdmin', label: 'System Admin', icon: ShieldCheck, description: "Manage schools and platform settings." },
-    { name: 'schoolAdmin', label: 'School Admin', icon: Building, description: "Manage your school, users, and courses." },
-    { name: 'teacher', label: 'Teacher', icon: Briefcase, description: "Manage courses, notifications & events."},
-    { name: 'parent', label: 'Parent', icon: Users, description: "View child's updates, notifications & calendar." },
+  type RoleConfig = { name: UserRole; translationKey: string; icon: React.ElementType };
+
+  const roles: RoleConfig[] = [
+    { name: 'systemAdmin', translationKey: 'systemAdmin', icon: ShieldCheck },
+    { name: 'schoolAdmin', translationKey: 'schoolAdmin', icon: Building },
+    { name: 'teacher', translationKey: 'teacher', icon: Briefcase },
+    { name: 'parent', translationKey: 'parent', icon: Users },
   ];
 
   return (
@@ -26,9 +37,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="items-center text-center">
           <SchoolComLogo size={48} className="mb-4" />
-          <CardTitle className="font-headline text-3xl">Welcome to SchoolCom</CardTitle>
+          <CardTitle className="font-headline text-3xl">{t('loginPage.welcomeTitle')}</CardTitle>
           <CardDescription className="text-md">
-            Your integrated school communication platform. Please select your role to continue.
+            {t('loginPage.welcomeDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -41,8 +52,10 @@ export default function LoginPage() {
             >
               <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
               <div className="text-left">
-                <span className="font-semibold">{roleItem.label}</span>
-                <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 transition-colors">{roleItem.description}</p>
+                <span className="font-semibold">{t(`loginPage.roles.${roleItem.translationKey}.label` as any)}</span>
+                <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 transition-colors">
+                  {t(`loginPage.roles.${roleItem.translationKey}.description` as any)}
+                </p>
               </div>
               <LogIn className="ml-auto h-5 w-5 opacity-50 group-hover:opacity-100 transition-opacity" />
             </Button>
@@ -50,8 +63,8 @@ export default function LoginPage() {
         </CardContent>
       </Card>
       <footer className="mt-8 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} SchoolCom. All rights reserved.</p>
-        <p>Streamlining communication for a brighter future in education.</p>
+        <p dangerouslySetInnerHTML={{ __html: t('loginPage.footer.copyright', { year: currentYear }) }} />
+        <p>{t('loginPage.footer.tagline')}</p>
       </footer>
     </div>
   );
