@@ -27,10 +27,10 @@ export function TeacherSidebarNav() {
               isActive={pathname === item.href || (item.href !== '/teacher' && pathname.startsWith(item.href))}
               tooltip={{ children: item.label, side: 'right', align: 'center' }}
             >
-              <>
+              <span>
                 <item.icon />
                 <span>{item.label}</span>
-              </>
+              </span>
             </SidebarMenuButton>
           </Link>
         </SidebarMenuItem>
