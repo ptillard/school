@@ -18,7 +18,7 @@ export default function LoginPage() {
     { name: 'systemAdmin', label: 'System Admin', icon: ShieldCheck, description: "Manage schools and platform settings." },
     { name: 'schoolAdmin', label: 'School Admin', icon: Building, description: "Manage your school, users, and courses." },
     { name: 'teacher', label: 'Teacher', icon: Briefcase, description: "Manage courses, notifications & events."},
-    { name: 'parent', label: 'Parent', icon: Users, description: "View your child's updates, notifications, and calendar." },
+    { name: 'parent', label: 'Parent', icon: Users, description: "View child's updates, notifications & calendar." },
   ];
 
   return (
