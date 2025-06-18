@@ -1,4 +1,3 @@
-
 "use client";
 import type { ReactNode } from 'react';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -40,12 +39,15 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
             {navItems.map(item => (
               <Link key={item.href} href={item.href} asChild>
                 <Button
-                  variant="ghost" // Base variant
+                  // No asChild here. Link's asChild passes props to Button, 
+                  // and Button (being a ShadCN component) will render as an <a> 
+                  // because it receives an href.
+                  variant="ghost" 
                   className={cn(
-                    "flex flex-col items-center justify-center h-16 w-full rounded-md", // Layout styles
+                    "flex flex-col items-center justify-center h-16 w-full rounded-md", 
                     (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) ?
-                      "text-primary bg-primary/10" : // Active state styles
-                      "text-muted-foreground hover:text-primary hover:bg-primary/5" // Default state styles
+                      "text-primary bg-primary/10" : 
+                      "text-muted-foreground hover:text-primary hover:bg-primary/5" 
                   )}
                 >
                   {/* Button children are directly rendered; Link + Button handles the <a> tag */}
