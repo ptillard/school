@@ -52,9 +52,9 @@ export default function LoginPage() {
             >
               <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
               <div className="text-left">
-                <span className="font-semibold">{t(`loginPage.roles.${roleItem.translationKey}.label` as any)}</span>
+                <span className="font-semibold">{t(`loginPage.roles.${roleItem.translationKey}.label`)}</span>
                 <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 transition-colors">
-                  {t(`loginPage.roles.${roleItem.translationKey}.description` as any)}
+                  {t(`loginPage.roles.${roleItem.translationKey}.description`)}
                 </p>
               </div>
               <LogIn className="ml-auto h-5 w-5 opacity-50 group-hover:opacity-100 transition-opacity" />
