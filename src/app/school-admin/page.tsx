@@ -2,7 +2,7 @@
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, BookOpen, MessageSquare, CalendarPlus, PlusCircle } from 'lucide-react';
+import { Users, BookOpen, MessageSquare, CalendarPlus, PlusCircle, Palette } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SchoolAdminDashboardPage() {
