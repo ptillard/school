@@ -47,11 +47,11 @@ const mockChildren: Child[] = [
 ];
 
 const mockNotifications: Notification[] = [
-    { id: 'n1', title: 'School Picnic Day', summary: 'Annual school picnic is scheduled for next Friday. Please sign the permission slip.', date: '3 days ago', type: 'event', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide' },
-    { id: 'n2', title: 'Math Homework Ch.5', summary: 'Complete exercises 1-10 from Chapter 5 by tomorrow.', date: '1 day ago', type: 'homework', read: false, sender: 'Ms. Davis', courseName: 'Mathematics Grade 5' },
-    { id: 'n3', title: 'Science Fair Update', summary: 'Project submission deadline extended to next Monday.', date: '5 days ago', type: 'announcement', read: true, sender: 'Mr. Smith', courseName: 'Science Grade 5' },
-    { id: 'n4', title: 'Parent-Teacher Meeting', summary: 'Scheduled for Grade 2 on Oct 25th.', date: '2 days ago', type: 'event', read: false, sender: 'Riverside Elementary Admin', courseName: 'School-Wide'},
-    { id: 'n5', title: 'Urgent: School Closure', summary: 'School closed tomorrow due to bad weather.', date: '1 hour ago', type: 'urgent', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide'},
+    { id: '1', title: 'School Picnic Day', summary: 'Annual school picnic is scheduled for next Friday. Please sign the permission slip.', date: '3 days ago', type: 'event', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide' },
+    { id: '2', title: 'Math Homework Ch.5', summary: 'Complete exercises 1-10 from Chapter 5 by tomorrow.', date: '1 day ago', type: 'homework', read: false, sender: 'Ms. Davis', courseName: 'Mathematics Grade 5' },
+    { id: '3', title: 'Science Fair Update', summary: 'Project submission deadline extended to next Monday.', date: '5 days ago', type: 'announcement', read: true, sender: 'Mr. Smith', courseName: 'Science Grade 5' },
+    { id: '4', title: 'Parent-Teacher Meeting', summary: 'Scheduled for Grade 2 on Oct 25th.', date: '2 days ago', type: 'event', read: false, sender: 'Riverside Elementary Admin', courseName: 'School-Wide'},
+    { id: '5', title: 'Urgent: School Closure', summary: 'School closed tomorrow due to bad weather.', date: '1 hour ago', type: 'urgent', read: false, sender: 'Greenwood High Admin', courseName: 'School-Wide'},
 ];
 
 
@@ -170,10 +170,10 @@ export default function ParentDashboardPage() {
         </CardHeader>
         <CardContent>
           {notifications.length > 0 ? (
-            <ul className="space-y-4">
-              {notifications.map((notif, index) => (
+            <ul className="divide-y divide-border">
+              {notifications.map((notif) => (
                 <li key={notif.id}>
-                  <Link href={`/parent/notifications/${notif.id}`} className="block p-4 rounded-lg hover:bg-muted/50 transition-colors border">
+                  <Link href={`/parent/notifications?notificationId=${notif.id}`} className="block p-4 rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 pt-0.5">
                         {getNotificationIcon(notif.type)}
@@ -191,7 +191,6 @@ export default function ParentDashboardPage() {
                       </div>
                     </div>
                   </Link>
-                   {index < notifications.length - 1 && <Separator className="my-4" />}
                 </li>
               ))}
             </ul>
@@ -203,16 +202,3 @@ export default function ParentDashboardPage() {
     </>
   );
 }
-
-// Dummy FileText component if not available from lucide-react (it is, but as an example)
-// Kept for safety, but LucideFileTextIcon from lucide-react is preferred
-const FileText = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-    <polyline points="14 2 14 8 20 8"></polyline>
-    <line x1="16" y1="13" x2="8" y2="13"></line>
-    <line x1="16" y1="17" x2="8" y2="17"></line>
-    <polyline points="10 9 9 9 8 9"></polyline>
-  </svg>
-);
-

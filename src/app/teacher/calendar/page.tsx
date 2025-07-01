@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
@@ -84,6 +85,7 @@ export default function TeacherCalendarPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<TeacherCalendarEvent | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -98,6 +100,14 @@ export default function TeacherCalendarPage() {
     setEventCourseId(courses.length > 0 ? courses[0].id : '');
     setEventDate(selectedDate || new Date());
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new-event') {
+      setEditingEvent(null);
+      resetForm();
+      setIsFormOpen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (editingEvent) {

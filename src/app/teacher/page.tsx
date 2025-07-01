@@ -17,7 +17,7 @@ export default function TeacherDashboardPage() {
   const quickLinks = [
     { href: "/teacher/courses", label: "View My Courses", icon: BookCopy },
     { href: "/teacher/notifications", label: "Create Notification", icon: MessageCirclePlus },
-    { href: "/teacher/calendar", label: "Add Calendar Event", icon: CalendarPlus },
+    { href: "/teacher/calendar?action=new-event", label: "Add Calendar Event", icon: CalendarPlus },
   ];
 
   return (

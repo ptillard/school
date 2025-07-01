@@ -1,6 +1,7 @@
 
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,29 +39,32 @@ interface Notification {
 const mockNotifications: Notification[] = [
   { 
     id: '1', childName: 'Alex Johnson', childAvatar: 'https://placehold.co/40x40.png?text=AJ', 
-    title: 'Math Homework Update', content: 'The deadline for the math homework (Chapter 5) has been extended to Wednesday. Please ensure Alex submits it by then. Also, a reminder about the upcoming quiz on Friday covering Chapters 3-5.', 
-    sender: 'Ms. Davis', courseName: 'Mathematics Grade 5', sentAt: '2023-09-10 09:15', type: 'homework', read: false,
-    attachments: [{name: 'Chapter5_Details.pdf', type: 'pdf', url: '#'}],
+    title: 'School Picnic Day', content: 'Annual school picnic is scheduled for next Friday. Please sign the permission slip.', 
+    sender: 'Greenwood High Admin', courseName: 'School-Wide', sentAt: '3 days ago', type: 'event', read: false,
+    attachments: [{name: 'Permission_Slip.pdf', type: 'pdf', url: '#'}],
+  },
+  { 
+    id: '2', childName: 'Alex Johnson', childAvatar: 'https://placehold.co/40x40.png?text=AJ', 
+    title: 'Math Homework Ch.5', content: 'Complete exercises 1-10 from Chapter 5 by tomorrow.', 
+    sender: 'Ms. Davis', courseName: 'Mathematics Grade 5', sentAt: '1 day ago', type: 'homework', read: false,
     replies: [
-        { sender: 'Parent', text: 'Thank you for the update, Ms. Davis. Will Alex need any specific materials for the quiz?', sentAt: '2023-09-10 10:00' },
-        { sender: 'Teacher/Admin', text: 'Hi Parent, just the standard textbook and a calculator. Good luck to Alex!', sentAt: '2023-09-10 11:30' },
+        { sender: 'Parent', text: 'Thank you for the update, Ms. Davis.', sentAt: '1 day ago' },
     ]
   },
   { 
-    id: '2', childName: 'Mia Williams', childAvatar: 'https://placehold.co/40x40.png?text=MW', 
-    title: 'Art Project: "My Family"', content: 'Mia needs to bring A3 drawing paper and color pencils for the "My Family" art project tomorrow.', 
-    sender: 'Mr. Lee', courseName: 'Art Grade 2', sentAt: '2023-09-09 14:30', type: 'announcement', read: true,
-  },
-  { 
     id: '3', childName: 'Alex Johnson', childAvatar: 'https://placehold.co/40x40.png?text=AJ', 
-    title: 'School Trip Permission Slip', content: 'Please return the permission slip for the Zoo trip by this Friday. The trip is scheduled for next Tuesday.', 
-    sender: 'Greenwood High Admin', sentAt: '2023-09-08 11:00', type: 'event', read: false,
-    attachments: [{name: 'Zoo_Trip_Permission.pdf', type: 'pdf', url: '#'}],
+    title: 'Science Fair Update', content: 'Project submission deadline extended to next Monday.', 
+    sender: 'Mr. Smith', courseName: 'Science Grade 5', sentAt: '5 days ago', type: 'announcement', read: true,
   },
    { 
     id: '4', childName: 'Mia Williams', childAvatar: 'https://placehold.co/40x40.png?text=MW', 
-    title: 'Urgent: Early Dismissal Today', content: 'Due to a water main break, school will be dismissed at 1 PM today. Please arrange for Mia\'s pickup.', 
-    sender: 'Riverside Elementary Admin', sentAt: '2023-09-11 10:00', type: 'urgent', read: false,
+    title: 'Parent-Teacher Meeting', content: 'Scheduled for Grade 2 on Oct 25th.', 
+    sender: 'Riverside Elementary Admin', courseName: 'School-Wide', sentAt: '2 days ago', type: 'event', read: false,
+  },
+  { 
+    id: '5', childName: 'Alex Johnson', childAvatar: 'https://placehold.co/40x40.png?text=AJ', 
+    title: 'Urgent: School Closure', content: 'School closed tomorrow due to bad weather.', 
+    sender: 'Greenwood High Admin', courseName: 'School-Wide', sentAt: '1 hour ago', type: 'urgent', read: false,
   },
 ];
 
@@ -81,12 +85,29 @@ export default function ParentNotificationsPage() {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [replyText, setReplyText] = useState('');
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
-  const handleSelectNotification = (notification: Notification) => {
+  const handleSelectNotification = useCallback((notification: Notification | null) => {
+    if (!notification) {
+      setSelectedNotification(null);
+      return;
+    }
     setSelectedNotification(notification);
     // Mark as read (locally for now)
     setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
-  };
+  }, []);
+
+  useEffect(() => {
+    const notificationId = searchParams.get('notificationId');
+    if (notificationId) {
+      const notificationToSelect = notifications.find(n => n.id === notificationId);
+      if (notificationToSelect) {
+        handleSelectNotification(notificationToSelect);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, notifications]);
+
 
   const handleSendReply = () => {
     if (!replyText.trim() || !selectedNotification) return;
@@ -151,7 +172,7 @@ export default function ParentNotificationsPage() {
         <Card className="md:col-span-2 shadow-lg">
           {selectedNotification ? (
             <>
-            <Dialog open={!!selectedNotification} onOpenChange={() => setSelectedNotification(null)}>
+            <Dialog open={!!selectedNotification} onOpenChange={() => handleSelectNotification(null)}>
                 <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
                     <DialogHeader className="p-6 border-b">
                         <DialogTitle className="font-headline text-2xl">{selectedNotification.title}</DialogTitle>
