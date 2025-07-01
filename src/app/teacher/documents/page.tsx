@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from '@/hooks/use-toast';
-import { UploadCloud, Trash2, Download, FileText, Image as ImageIcon, FileZip, Search } from 'lucide-react';
+import { UploadCloud, Trash2, Download, FileText, Image as ImageIcon, FileArchive, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
@@ -72,7 +72,7 @@ const getFileIcon = (type: FileIconType) => {
     switch(type) {
         case 'image': return <ImageIcon className="h-12 w-12 text-muted-foreground" />;
         case 'pdf': return <FileText className="h-12 w-12 text-muted-foreground" />;
-        case 'zip': return <FileZip className="h-12 w-12 text-muted-foreground" />;
+        case 'zip': return <FileArchive className="h-12 w-12 text-muted-foreground" />;
         default: return <FileText className="h-12 w-12 text-muted-foreground" />;
     }
 }
