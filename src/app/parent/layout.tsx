@@ -5,7 +5,7 @@ import { SchoolComLogo } from '@/components/SchoolComLogo';
 import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/navigation/UserNav';
 import Link from 'next/link';
-import { Bell, CalendarDays, UserCircle, Home } from 'lucide-react';
+import { Bell, CalendarDays, UserCircle, Home, Files } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
     { href: '/parent', label: 'Home', icon: Home },
     { href: '/parent/notifications', label: 'Notifications', icon: Bell },
     { href: '/parent/calendar', label: 'Calendar', icon: CalendarDays },
+    { href: '/parent/documents', label: 'Documents', icon: Files },
     { href: '/parent/profile', label: 'Profile', icon: UserCircle },
   ];
 
@@ -35,13 +36,10 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 container py-6">{children}</main>
 
         <footer className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
-          <nav className="container grid grid-cols-4 items-center justify-items-center gap-1 p-2">
+          <nav className="container grid grid-cols-5 items-center justify-items-center gap-1 p-2">
             {navItems.map(item => (
               <Link key={item.href} href={item.href} asChild>
                 <Button
-                  // No asChild here. Link's asChild passes props to Button, 
-                  // and Button (being a ShadCN component) will render as an <a> 
-                  // because it receives an href.
                   variant="ghost" 
                   className={cn(
                     "flex flex-col items-center justify-center h-16 w-full rounded-md", 
@@ -50,7 +48,6 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
                       "text-muted-foreground hover:text-primary hover:bg-primary/5" 
                   )}
                 >
-                  {/* Button children are directly rendered; Link + Button handles the <a> tag */}
                   <item.icon className="h-6 w-6 mb-0.5" />
                   <span className="text-xs">{item.label}</span>
                 </Button>

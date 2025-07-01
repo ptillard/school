@@ -1,8 +1,7 @@
-
 "use client";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
-import { LayoutDashboard, BookCopy, MessageCircle, CalendarCheck2, UserCircle } from 'lucide-react';
+import { LayoutDashboard, BookCopy, MessageCircle, CalendarCheck2, UserCircle, Files } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +10,7 @@ const navItems = [
   { href: '/teacher/courses', label: 'My Courses', icon: BookCopy },
   { href: '/teacher/notifications', label: 'Send Notifications', icon: MessageCircle },
   { href: '/teacher/calendar', label: 'Course Calendar', icon: CalendarCheck2 },
+  { href: '/teacher/documents', label: 'Shared Documents', icon: Files },
   { href: '/teacher/profile', label: 'My Profile', icon: UserCircle },
 ];
 

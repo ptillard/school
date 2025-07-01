@@ -1,8 +1,7 @@
-
 "use client";
 
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
-import { LayoutDashboard, Palette, BookOpen, Users, MessageSquare, CalendarDays, FileInput, Settings } from 'lucide-react';
+import { LayoutDashboard, Palette, BookOpen, Users, MessageSquare, CalendarDays, FileInput, Settings, Files } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -13,6 +12,7 @@ const navItems = [
   { href: '/school-admin/users', label: 'Manage Users', icon: Users },
   { href: '/school-admin/notifications', label: 'Send Notifications', icon: MessageSquare },
   { href: '/school-admin/calendar', label: 'Manage Calendar', icon: CalendarDays },
+  { href: '/school-admin/documents', label: 'Shared Documents', icon: Files },
   { href: '/school-admin/csv', label: 'CSV Import/Export', icon: FileInput },
   { href: '/school-admin/settings', label: 'School Settings', icon: Settings },
 ];
