@@ -2,8 +2,8 @@
 {
   "appTitle": "SchoolCom",
   "loginPage": {
-    "welcomeTitle": "Welcome to SchoolCom",
-    "welcomeDescription": "Your integrated school communication platform. Please select your role to continue.",
+    "welcomeTitle": "Welcome back",
+    "welcomeDescription": "Select your role to sign in.",
     "roles": {
       "systemAdmin": {
         "label": "System Admin",

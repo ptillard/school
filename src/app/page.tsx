@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-background to-background p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="items-center text-center">
           <SchoolComLogo size={48} className="mb-4" />
           <CardTitle className="font-headline text-3xl">{t('loginPage.welcomeTitle')}</CardTitle>
@@ -47,7 +47,7 @@ export default function LoginPage() {
             <Button
               key={roleItem.name}
               onClick={() => handleLogin(roleItem.name)}
-              className="w-full justify-start text-base py-6 group hover:shadow-lg transition-shadow"
+              className="w-full justify-start text-base py-5 group hover:shadow-lg transition-shadow rounded-lg"
               variant="outline"
             >
               <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
