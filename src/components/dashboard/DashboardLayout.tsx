@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from 'react';
@@ -56,7 +57,7 @@ export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutPr
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader className="p-4 border-b border-sidebar-border">
           <SchoolComLogo className="text-sidebar-primary" />
         </SidebarHeader>
