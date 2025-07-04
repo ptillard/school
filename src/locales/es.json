@@ -53,7 +53,6 @@
     "noResults": "No se encontraron resultados."
   },
   "dashboard": {
-    "logoutAndHome": "Salir e Inicio",
     "title": "Panel de {role}",
     "allRightsReserved": "Todos los derechos reservados."
   },
