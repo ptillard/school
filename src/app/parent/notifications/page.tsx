@@ -21,6 +21,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Notification {
   id: string;
@@ -88,18 +89,15 @@ export default function ParentNotificationsPage() {
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const notificationId = searchParams.get('notificationId');
+  const isMobile = useIsMobile();
 
   const handleSelectNotification = useCallback((notification: Notification | null) => {
-    if (!notification) {
-      setSelectedNotification(null);
-      return;
+    if (notification) {
+        setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
     }
     setSelectedNotification(notification);
-    // Mark as read (locally for now)
-    setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
   }, []);
-
-  const notificationId = searchParams.get('notificationId');
 
   useEffect(() => {
     if (notificationId) {
@@ -116,7 +114,6 @@ export default function ParentNotificationsPage() {
     
     const newReply = { sender: 'Parent' as const, text: replyText, sentAt: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) };
     
-    // Update local state
     const updatedNotification = {
         ...selectedNotification,
         replies: [...(selectedNotification.replies || []), newReply]
@@ -127,6 +124,59 @@ export default function ParentNotificationsPage() {
     toast({ title: t('parentPortal.notifications.replySent'), description: t('parentPortal.notifications.replySentDesc'), className:"bg-accent text-accent-foreground" });
     setReplyText('');
   };
+
+  const notificationDetailContent = (notification: Notification) => (
+    <>
+        <ScrollArea className="flex-grow p-6">
+            <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: notification.content.replace(/\n/g, '<br />') }} />
+
+            {notification.attachments && notification.attachments.length > 0 && (
+            <div className="mt-6">
+                <h4 className="font-semibold mb-2">{t('parentPortal.notifications.attachments')}</h4>
+                <ul className="space-y-2">
+                {notification.attachments.map(att => (
+                    <li key={att.name}>
+                    <a href={att.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center">
+                        <FileText className="h-4 w-4 mr-2" /> {att.name} ({att.type})
+                    </a>
+                    </li>
+                ))}
+                </ul>
+            </div>
+            )}
+
+            {notification.replies && notification.replies.length > 0 && (
+                <div className="mt-8">
+                    <h4 className="font-semibold mb-4 border-t pt-4">{t('parentPortal.notifications.conversationHistory')}</h4>
+                    <div className="space-y-4">
+                        {notification.replies.map((reply, index) => (
+                            <div key={index} className={`flex ${reply.sender === 'Parent' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[70%] p-3 rounded-lg ${reply.sender === 'Parent' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                                    <p className="text-sm">{reply.text}</p>
+                                    <p className={`text-xs mt-1 ${reply.sender === 'Parent' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground text-left'}`}>{reply.sentAt}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </ScrollArea>
+        <div className="p-4 border-t bg-background">
+            <div className="w-full flex items-center gap-2">
+            <Textarea
+                placeholder={t('parentPortal.notifications.replyPlaceholder')}
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                className="flex-grow resize-none"
+                rows={1}
+            />
+            <Button onClick={handleSendReply} disabled={!replyText.trim()}>
+                <Send className="h-4 w-4 mr-2" /> {t('parentPortal.notifications.replyButton')}
+            </Button>
+            </div>
+        </div>
+    </>
+  );
 
   return (
     <>
@@ -141,7 +191,7 @@ export default function ParentNotificationsPage() {
             <CardDescription>{t('parentPortal.notifications.inboxDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[calc(100vh-20rem)] md:h-[calc(100vh-16rem)]">
+            <ScrollArea className="h-[calc(100vh-18rem)]">
               {notifications.length > 0 ? (
                 notifications.map(notif => (
                   <button
@@ -171,73 +221,9 @@ export default function ParentNotificationsPage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 shadow-lg">
+        <Card className="md:col-span-2 shadow-lg hidden md:flex flex-col">
           {selectedNotification ? (
             <>
-            <Dialog open={!!selectedNotification} onOpenChange={() => handleSelectNotification(null)}>
-                <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
-                    <DialogHeader className="p-6 border-b">
-                        <DialogTitle className="font-headline text-2xl">{selectedNotification.title}</DialogTitle>
-                        <DialogDescription>
-                        {t('parentPortal.notifications.detailsFor', {childName: selectedNotification.childName, sender: selectedNotification.sender})} {selectedNotification.courseName ? `(${selectedNotification.courseName})` : ''} - {selectedNotification.sentAt}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <ScrollArea className="flex-grow p-6">
-                        <div className="prose prose-sm max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: selectedNotification.content.replace(/\n/g, '<br />') }} />
-
-                        {selectedNotification.attachments && selectedNotification.attachments.length > 0 && (
-                        <div className="mt-6">
-                            <h4 className="font-semibold mb-2">{t('parentPortal.notifications.attachments')}</h4>
-                            <ul className="space-y-2">
-                            {selectedNotification.attachments.map(att => (
-                                <li key={att.name}>
-                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center">
-                                    <FileText className="h-4 w-4 mr-2" /> {att.name} ({att.type})
-                                </a>
-                                </li>
-                            ))}
-                            </ul>
-                        </div>
-                        )}
-
-                        {selectedNotification.replies && selectedNotification.replies.length > 0 && (
-                            <div className="mt-8">
-                                <h4 className="font-semibold mb-4 border-t pt-4">{t('parentPortal.notifications.conversationHistory')}</h4>
-                                <div className="space-y-4">
-                                    {selectedNotification.replies.map((reply, index) => (
-                                        <div key={index} className={`flex ${reply.sender === 'Parent' ? 'justify-end' : 'justify-start'}`}>
-                                            <div className={`max-w-[70%] p-3 rounded-lg ${reply.sender === 'Parent' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                                                <p className="text-sm">{reply.text}</p>
-                                                <p className={`text-xs mt-1 ${reply.sender === 'Parent' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground text-left'}`}>{reply.sentAt}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </ScrollArea>
-                    <DialogFooter className="p-4 border-t bg-background">
-                        <div className="w-full flex items-center gap-2">
-                        <Textarea
-                            placeholder={t('parentPortal.notifications.replyPlaceholder')}
-                            value={replyText}
-                            onChange={(e) => setReplyText(e.target.value)}
-                            className="flex-grow resize-none"
-                            rows={1}
-                        />
-                        <Button onClick={handleSendReply} disabled={!replyText.trim()}>
-                            <Send className="h-4 w-4 mr-2" /> {t('parentPortal.notifications.replyButton')}
-                        </Button>
-                        <DialogClose asChild>
-                            <Button variant="outline">{t('parentPortal.notifications.closeButton')}</Button>
-                        </DialogClose>
-                        </div>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-
-            {/* This part is for the main page when a notification is selected but not in dialog */}
             <CardHeader className="border-b">
                 <div className="flex items-center justify-between">
                     <div>
@@ -246,61 +232,11 @@ export default function ParentNotificationsPage() {
                            {t('parentPortal.notifications.detailsFor', {childName: selectedNotification.childName, sender: selectedNotification.sender})} {selectedNotification.courseName ? `(${selectedNotification.courseName})` : ''}
                         </CardDescription>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => { /* This button could open the Dialog again if it was closed */ }}>
-                        <Maximize2 className="h-5 w-5" />
-                    </Button>
                 </div>
                 <p className="text-xs text-muted-foreground pt-1">{selectedNotification.sentAt}</p>
             </CardHeader>
-            <CardContent className="pt-6">
-                <ScrollArea className="h-[calc(100vh-28rem)] md:h-[calc(100vh-24rem)] pr-3">
-                <div className="prose prose-sm max-w-none dark:prose-invert mb-6" dangerouslySetInnerHTML={{ __html: selectedNotification.content.replace(/\n/g, '<br />') }} />
-                
-                {selectedNotification.attachments && selectedNotification.attachments.length > 0 && (
-                    <div className="mt-4">
-                        <h4 className="font-semibold mb-2 text-sm">{t('parentPortal.notifications.attachments')}</h4>
-                        <ul className="space-y-1">
-                        {selectedNotification.attachments.map(att => (
-                            <li key={att.name}>
-                            <a href={att.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline text-sm flex items-center">
-                                <FileText className="h-4 w-4 mr-1.5 flex-shrink-0" /> {att.name}
-                            </a>
-                            </li>
-                        ))}
-                        </ul>
-                        <Separator className="my-4"/>
-                    </div>
-                )}
-
-                {selectedNotification.replies && selectedNotification.replies.length > 0 && (
-                    <div className="mt-4">
-                        <h4 className="font-semibold mb-3 text-sm">{t('parentPortal.notifications.conversationHistory')}</h4>
-                        <div className="space-y-3">
-                            {selectedNotification.replies.map((reply, index) => (
-                                <div key={index} className={`flex ${reply.sender === 'Parent' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[80%] p-2.5 rounded-lg text-sm ${reply.sender === 'Parent' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                                        <p>{reply.text}</p>
-                                        <p className={`text-xs mt-1 ${reply.sender === 'Parent' ? 'text-primary-foreground/70 text-right' : 'text-muted-foreground text-left'}`}>{reply.sentAt}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <Separator className="my-4"/>
-                    </div>
-                )}
-                
-                <div className="mt-4 flex items-start gap-2">
-                    <Textarea
-                    placeholder={t('parentPortal.notifications.replyPlaceholder')}
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    className="flex-grow resize-none min-h-[60px]"
-                    />
-                    <Button onClick={handleSendReply} disabled={!replyText.trim()} className="self-end">
-                        <Send className="h-4 w-4 mr-2" /> {t('parentPortal.notifications.replyButton')}
-                    </Button>
-                </div>
-                </ScrollArea>
+            <CardContent className="pt-0 p-0 flex-grow flex flex-col">
+                {notificationDetailContent(selectedNotification)}
             </CardContent>
             </>
           ) : (
@@ -312,6 +248,28 @@ export default function ParentNotificationsPage() {
           )}
         </Card>
       </div>
+      
+      {/* DIALOG FOR MOBILE VIEW */}
+      <Dialog open={isMobile && !!selectedNotification} onOpenChange={(open) => { if(!open) handleSelectNotification(null)}}>
+          <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
+             {selectedNotification && (
+                <>
+                <DialogHeader className="p-6 border-b">
+                    <DialogTitle className="font-headline text-2xl">{selectedNotification.title}</DialogTitle>
+                    <DialogDescription>
+                    {t('parentPortal.notifications.detailsFor', {childName: selectedNotification.childName, sender: selectedNotification.sender})} {selectedNotification.courseName ? `(${selectedNotification.courseName})` : ''} - {selectedNotification.sentAt}
+                    </DialogDescription>
+                </DialogHeader>
+                {notificationDetailContent(selectedNotification)}
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline" className="w-full">{t('parentPortal.notifications.closeButton')}</Button>
+                    </DialogClose>
+                </DialogFooter>
+                </>
+             )}
+          </DialogContent>
+      </Dialog>
     </>
   );
 }

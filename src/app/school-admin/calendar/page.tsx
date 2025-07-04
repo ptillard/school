@@ -76,6 +76,7 @@ export default function SchoolAdminCalendarPage() {
   const [editingEvent, setEditingEvent] = useState<SchoolCalendarEvent | null>(null);
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const action = searchParams.get('action');
 
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -92,8 +93,6 @@ export default function SchoolAdminCalendarPage() {
     setIsInstitutionWide(true);
     setTargetAudience("All");
   }, []);
-
-  const action = searchParams.get('action');
 
   useEffect(() => {
     if (action === 'new-event') {
@@ -112,13 +111,9 @@ export default function SchoolAdminCalendarPage() {
         setEventDate(editingEvent.date);
         setIsInstitutionWide(editingEvent.isInstitutionWide);
         setTargetAudience(editingEvent.targetAudience || "All");
-        } else {
-        // resetForm is called when opening for new or from query param
-        // ensure date is set correctly if selectedDate is available
-        // setEventDate(selectedDate || new Date());
         }
     }
-  }, [editingEvent, isFormOpen, selectedDate]);
+  }, [editingEvent, isFormOpen]);
 
 
   const handleAddOrUpdateEvent = () => {
@@ -261,7 +256,7 @@ export default function SchoolAdminCalendarPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[300px] md:h-[calc(100vh-25rem)]">
+            <ScrollArea className="h-[400px] lg:h-[calc(100vh-25rem)]">
               {eventsForSelectedDate.length > 0 ? (
                 <ul className="divide-y divide-border">
                   {eventsForSelectedDate.map(event => {

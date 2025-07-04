@@ -86,6 +86,7 @@ export default function TeacherCalendarPage() {
   const [editingEvent, setEditingEvent] = useState<TeacherCalendarEvent | null>(null);
   const { toast } = useToast();
   const searchParams = useSearchParams();
+  const action = searchParams.get('action');
 
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -100,8 +101,6 @@ export default function TeacherCalendarPage() {
     setEventCourseId(courses.length > 0 ? courses[0].id : '');
     setEventDate(selectedDate || new Date());
   }, [courses, selectedDate]);
-
-  const action = searchParams.get('action');
 
   useEffect(() => {
     if (action === 'new-event') {
@@ -152,7 +151,6 @@ export default function TeacherCalendarPage() {
     }
     setIsFormOpen(false);
     setEditingEvent(null);
-    // resetForm(); // Reset form is handled by onOpenChange when dialog closes or when opening for new.
   };
   
   const handleDeleteEvent = (eventId: string) => {
@@ -185,7 +183,6 @@ export default function TeacherCalendarPage() {
                 setEditingEvent(null); 
                 resetForm();
                 setEventDate(selectedDate || new Date()); 
-                // setIsFormOpen(true); // DialogTrigger handles opening
               }}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Event
               </Button>
@@ -289,7 +286,7 @@ export default function TeacherCalendarPage() {
             <CardDescription>Scroll to see all events.</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[300px] md:h-[calc(100vh-25rem)]">
+            <ScrollArea className="h-[400px] lg:h-[calc(100vh-25rem)]">
               {eventsForSelectedDate.length > 0 ? (
                 <ul className="divide-y divide-border">
                   {eventsForSelectedDate.map(event => {

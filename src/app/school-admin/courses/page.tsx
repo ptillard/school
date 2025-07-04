@@ -79,6 +79,7 @@ export default function ManageCoursesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const action = searchParams.get('action');
   
   // Form state
   const [courseName, setCourseName] = useState('');
@@ -86,8 +87,6 @@ export default function ManageCoursesPage() {
   const [subject, setSubject] = useState('');
   const [teacherId, setTeacherId] = useState<string | undefined>(undefined);
   const [description, setDescription] = useState('');
-
-  const action = searchParams.get('action');
 
   useEffect(() => {
     if (action === 'new-course') {
@@ -176,7 +175,7 @@ export default function ManageCoursesPage() {
               <Label htmlFor="courseNameForm">Course Name <span className="text-destructive">*</span></Label>
               <Input id="courseNameForm" value={courseName} onChange={(e) => setCourseName(e.target.value)} placeholder="e.g., Advanced Biology" className="mt-1" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="gradeLevelForm">Grade Level <span className="text-destructive">*</span></Label>
                 <Input id="gradeLevelForm" value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} placeholder="e.g., Grade 10" className="mt-1" />

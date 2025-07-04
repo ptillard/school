@@ -94,7 +94,7 @@ export default function ParentCalendarPage() {
             <CardDescription>{t('parentPortal.calendar.eventsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <ScrollArea className="h-[300px] md:h-[calc(100vh-22rem)]"> {/* Adjust height as needed */}
+            <ScrollArea className="h-[400px] lg:h-[calc(100vh-22rem)]">
               {eventsForSelectedDate.length > 0 ? (
                 <ul className="divide-y divide-border">
                   {eventsForSelectedDate.map(event => {
