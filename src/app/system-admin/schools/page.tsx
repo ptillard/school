@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, Edit, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,6 +27,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
+  DialogTrigger
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -97,6 +99,7 @@ export default function ManageSchoolsPage() {
     if (searchParams.get('action') === 'new') {
       handleCreateSchool();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
 
@@ -123,7 +126,7 @@ export default function ManageSchoolsPage() {
     }
   };
 
-  const onFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!schoolName.trim() || !adminEmail.trim()) {
       toast({ title: "Missing Fields", description: "School Name and Admin Email are required.", variant: "destructive" });
@@ -162,76 +165,19 @@ export default function ManageSchoolsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Schools"
-        actions={
-          <div className="flex w-full items-center gap-2 md:w-auto">
-            <div className="relative flex-1 md:flex-grow-0">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                type="search"
-                placeholder="Search schools..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-                />
-            </div>
-            <Button variant="outline">Export</Button>
-            <Button onClick={handleCreateSchool}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add School
-            </Button>
-          </div>
-        }
-      />
-
-      <div className="overflow-x-auto rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>School Name</TableHead>
-              <TableHead>Admin Email</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Users</TableHead>
-              <TableHead>Visible on app</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSchools.map((school) => (
-              <TableRow key={school.id}>
-                <TableCell className="font-medium">{school.name}</TableCell>
-                <TableCell>{school.adminEmail}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={school.status === 'active' ? 'default' : school.status === 'pending' ? 'secondary' : 'destructive'}
-                    className={school.status === 'active' ? 'bg-green-100 text-green-800' : ''}
-                  >
-                    {school.status.charAt(0).toUpperCase() + school.status.slice(1)}
-                  </Badge>
-                </TableCell>
-                <TableCell>{school.userCount}</TableCell>
-                <TableCell>
-                    <Switch
-                        checked={school.isVisible}
-                        onCheckedChange={(checked) => {
-                            setSchools(schools.map(s => s.id === school.id ? {...s, isVisible: checked} : s))
-                        }}
-                    />
-                </TableCell>
-              </TableRow>
-            ))}
-            {filteredSchools.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center h-24">
-                  No schools found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      
       <Dialog open={isFormOpen} onOpenChange={(open) => { setIsFormOpen(open); if (!open) setEditingSchool(null); }}>
+        <PageHeader
+          title="Manage Schools"
+          description="Onboard new schools and manage existing institutions."
+          actions={
+            <DialogTrigger asChild>
+                <Button onClick={handleCreateSchool}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add School
+                </Button>
+            </DialogTrigger>
+          }
+        />
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-headline">{editingSchool ? 'Edit School' : 'Create New School'}</DialogTitle>
@@ -269,6 +215,82 @@ export default function ManageSchoolsPage() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      <Card className="mb-6">
+        <CardContent className="p-4">
+            <div className="relative">
+                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Search schools..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full md:w-1/2 pl-8"
+                />
+            </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle>School List</CardTitle>
+            <CardDescription>A list of all schools in the platform.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Table>
+            <TableHeader>
+                <TableRow>
+                <TableHead>School Name</TableHead>
+                <TableHead>Admin Email</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Users</TableHead>
+                <TableHead>Visible</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {filteredSchools.map((school) => (
+                <TableRow key={school.id}>
+                    <TableCell className="font-medium">{school.name}</TableCell>
+                    <TableCell>{school.adminEmail}</TableCell>
+                    <TableCell>
+                    <Badge
+                        variant={school.status === 'active' ? 'default' : school.status === 'pending' ? 'secondary' : 'destructive'}
+                        className={school.status === 'active' ? 'bg-green-100 text-green-800' : ''}
+                    >
+                        {school.status.charAt(0).toUpperCase() + school.status.slice(1)}
+                    </Badge>
+                    </TableCell>
+                    <TableCell>{school.userCount}</TableCell>
+                    <TableCell>
+                        <Switch
+                            checked={school.isVisible}
+                            onCheckedChange={(checked) => {
+                                setSchools(schools.map(s => s.id === school.id ? {...s, isVisible: checked} : s))
+                            }}
+                        />
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                        <Button variant="ghost" size="icon" onClick={() => { setEditingSchool(school); setIsFormOpen(true); }}>
+                            <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => setSchoolToDelete(school)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                    </TableCell>
+                </TableRow>
+                ))}
+                {filteredSchools.length === 0 && (
+                <TableRow>
+                    <TableCell colSpan={6} className="text-center h-24">
+                    No schools found.
+                    </TableCell>
+                </TableRow>
+                )}
+            </TableBody>
+            </Table>
+        </CardContent>
+      </Card>
 
       <Dialog open={!!schoolToDelete} onOpenChange={() => setSchoolToDelete(null)}>
         <DialogContent>

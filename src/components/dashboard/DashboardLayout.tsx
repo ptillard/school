@@ -32,25 +32,16 @@ export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutPr
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <Sidebar collapsible="icon">
+      <Sidebar>
         <SidebarHeader className="p-4 border-b border-sidebar-border">
-           <div className="flex items-center"> {/* Ensure items are left-aligned */}
-             {/* Icon-only logo: shown only when sidebar is collapsed to icon state */}
-             <div className="group-data-[collapsible=icon]:block hidden">
-               <SchoolComLogo showText={false} size={28} />
-             </div>
-             {/* Full logo: shown only when sidebar is expanded */}
-             <div className="group-data-[collapsible=icon]:hidden">
-                <SchoolComLogo showText={true} className="ml-1" size={28} />
-             </div>
-           </div>
+          <SchoolComLogo className="text-sidebar-primary" />
         </SidebarHeader>
         <SidebarContent className="p-2">
           {sidebarNavItems}
         </SidebarContent>
         <SidebarFooter className="p-2 mt-auto border-t border-sidebar-border">
-          <Button variant="ghost" onClick={logout} className="w-full justify-start group-data-[collapsible=icon]:justify-center">
-            <Home className="mr-2 h-4 w-4 group-data-[collapsible=icon]:mr-0" />
+          <Button variant="ghost" onClick={logout} className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+            <Home className="mr-2 h-4 w-4" />
             <span className="group-data-[collapsible=icon]:hidden">Logout & Home</span>
           </Button>
         </SidebarFooter>
