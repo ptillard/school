@@ -51,7 +51,7 @@ export default function LoginPage() {
             >
               <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
               <div className="text-left">
-                <span className="font-semibold">{t(`loginPage.roles.${roleItem.translationKey}.label`)}</span>
+                <span className="font-semibold text-primary group-hover:text-primary-foreground">{t(`loginPage.roles.${roleItem.translationKey}.label`)}</span>
                 <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 transition-colors">
                   {t(`loginPage.roles.${roleItem.translationKey}.description`)}
                 </p>
