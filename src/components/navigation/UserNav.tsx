@@ -17,7 +17,7 @@ import { LogOut, UserCircle, Settings, Sun, Moon, Languages } from "lucide-react
 import { useEffect, useState } from "react";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
-
+import Link from 'next/link';
 
 // Dummy useTheme for now
 const useTheme = () => {
@@ -64,6 +64,8 @@ export function UserNav() {
   const handleToggleLanguage = () => {
     toggleLanguage();
   };
+  
+  const profilePath = role === 'parent' || role === 'teacher' ? `/${role}/profile` : `/${role}/settings`;
 
   return (
     <DropdownMenu>
@@ -89,13 +91,17 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserCircle className="mr-2 h-4 w-4" />
-            <span>{t('userNav.profile')}</span>
+          <DropdownMenuItem asChild>
+            <Link href={profilePath}>
+              <UserCircle className="mr-2 h-4 w-4" />
+              <span>{t('userNav.profile')}</span>
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>{t('userNav.settings')}</span>
+          <DropdownMenuItem asChild>
+            <Link href={profilePath}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>{t('userNav.settings')}</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
