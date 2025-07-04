@@ -1,3 +1,4 @@
+
 "use client";
 import type { ReactNode } from 'react';
 import { AuthGuard } from '@/components/AuthGuard';
@@ -38,20 +39,22 @@ export default function ParentLayout({ children }: { children: ReactNode }) {
         <footer className="sticky bottom-0 z-50 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
           <nav className="container grid grid-cols-5 items-center justify-items-center gap-1 p-2">
             {navItems.map(item => (
-              <Link key={item.href} href={item.href} asChild>
-                <Button
-                  variant="ghost" 
-                  className={cn(
-                    "flex flex-col items-center justify-center h-16 w-full rounded-md", 
-                    (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) ?
-                      "text-primary bg-primary/10" : 
-                      "text-muted-foreground hover:text-primary hover:bg-primary/5" 
-                  )}
-                >
+              <Button
+                key={item.href}
+                asChild
+                variant="ghost" 
+                className={cn(
+                  "flex flex-col items-center justify-center h-16 w-full rounded-md", 
+                  (pathname === item.href || (item.href !== '/parent' && pathname.startsWith(item.href))) ?
+                    "text-primary bg-primary/10" : 
+                    "text-muted-foreground hover:text-primary hover:bg-primary/5" 
+                )}
+              >
+                <Link href={item.href}>
                   <item.icon className="h-6 w-6 mb-0.5" />
                   <span className="text-xs">{item.label}</span>
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             ))}
           </nav>
         </footer>
