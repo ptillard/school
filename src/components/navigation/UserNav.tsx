@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, UserCircle, Settings, Sun, Moon, Languages } from "lucide-react";
+import { LogOut, UserCircle, Sun, Moon, Languages } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -95,12 +95,6 @@ export function UserNav() {
             <Link href={profilePath}>
               <UserCircle className="mr-2 h-4 w-4" />
               <span>{t('userNav.profile')}</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={profilePath}>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>{t('userNav.settings')}</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

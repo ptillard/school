@@ -29,7 +29,6 @@
   },
   "userNav": {
     "profile": "Profile",
-    "settings": "Settings",
     "toggleTheme": "Toggle Theme",
     "logout": "Log out",
     "roleLabel": "Role:",
