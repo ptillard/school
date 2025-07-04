@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { Home } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -25,10 +26,11 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutProps) {
   const { role, logout } = useAuth();
+  const { t } = useTranslation();
   
-  // Determine defaultOpen state based on role or localStorage preference
   const defaultOpen = typeof window !== 'undefined' ? localStorage.getItem('sidebar_state') !== 'false' : true;
 
+  const roleName = role ? t(`roles.${role}`) : t('roles.guest');
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
@@ -42,7 +44,7 @@ export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutPr
         <SidebarFooter className="p-2 mt-auto border-t border-sidebar-border">
           <Button variant="ghost" onClick={logout} className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
             <Home className="mr-2 h-4 w-4" />
-            <span className="group-data-[collapsible=icon]:hidden">Logout & Home</span>
+            <span className="group-data-[collapsible=icon]:hidden">{t('dashboard.logoutAndHome')}</span>
           </Button>
         </SidebarFooter>
       </Sidebar>
@@ -53,7 +55,7 @@ export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutPr
             <div className="hidden md:block ml-2">
               <Link href={`/${role}`} passHref>
                 <Button variant="ghost" className="text-lg font-semibold font-headline">
-                  {role?.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} Dashboard
+                  {t('dashboard.title', { role: roleName })}
                 </Button>
               </Link>
             </div>
@@ -64,7 +66,7 @@ export function DashboardLayout({ children, sidebarNavItems }: DashboardLayoutPr
           {children}
         </main>
          <footer className="border-t bg-background/80 px-4 py-3 text-center text-xs text-muted-foreground backdrop-blur-md sm:px-6">
-          &copy; {new Date().getFullYear()} SchoolCom. All rights reserved.
+          &copy; {new Date().getFullYear()} SchoolCom. {t('dashboard.allRightsReserved')}
         </footer>
       </SidebarInset>
     </SidebarProvider>

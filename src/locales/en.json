@@ -33,7 +33,6 @@
     "toggleTheme": "Toggle Theme",
     "logout": "Log out",
     "roleLabel": "Role:",
-    "language": "Language",
     "switchToSpanish": "Español",
     "switchToEnglish": "English"
   },
@@ -43,5 +42,126 @@
     "teacher": "Teacher",
     "parent": "Parent",
     "guest": "Guest"
+  },
+  "common": {
+    "new": "New",
+    "viewAll": "View All",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search...",
+    "noResults": "No results found."
+  },
+  "dashboard": {
+    "logoutAndHome": "Logout & Home",
+    "title": "{role} Dashboard",
+    "allRightsReserved": "All rights reserved."
+  },
+  "parentPortal": {
+    "sidebar": {
+      "home": "Home",
+      "notifications": "Notifications",
+      "calendar": "Calendar",
+      "documents": "Documents",
+      "profile": "Profile"
+    },
+    "dashboard": {
+      "title": "{childName}'s Dashboard",
+      "titleNoChild": "Parent Dashboard",
+      "description": "Stay updated with your child's school activities.",
+      "selectChildLabel": "Select Child:",
+      "selectChildPlaceholder": "Select a child",
+      "unreadNotifications": "Unread Notifications",
+      "unreadNotificationsDesc": "Important updates",
+      "upcomingEvents": "Upcoming Events",
+      "upcomingEventsDesc": "In the next 7 days",
+      "childProfile": "Child Profile",
+      "recentNotifications": "Recent Notifications",
+      "recentNotificationsDesc": "Latest updates for {childName}.",
+      "recentNotificationsDescNoChild": "Latest updates for your children.",
+      "from": "From: {sender}",
+      "noNotifications": "No recent notifications."
+    },
+    "notifications": {
+      "title": "My Notifications",
+      "description": "All communications regarding your children.",
+      "inbox": "Inbox",
+      "inboxDescription": "Select a notification to view details.",
+      "noNotifications": "No notifications.",
+      "detailsFor": "For {childName} from {sender}",
+      "attachments": "Attachments:",
+      "conversationHistory": "Conversation History:",
+      "replyPlaceholder": "Type your reply...",
+      "replyButton": "Reply",
+      "closeButton": "Close",
+      "replySent": "Reply Sent",
+      "replySentDesc": "Your reply has been sent to the sender.",
+      "noNotificationSelected": "No Notification Selected",
+      "noNotificationSelectedDesc": "Please select a notification from the list to view its details."
+    },
+    "calendar": {
+      "title": "My Calendar",
+      "description": "View school-wide and course-specific events for your children.",
+      "eventsFor": "Events for: {date}",
+      "noDateSelected": "No date selected",
+      "eventsDescription": "Scroll to see all events on this day.",
+      "noEvents": "No events scheduled for this day.",
+      "eventTypes": {
+        "schoolWide": "School-Wide",
+        "courseEvent": "Course Event",
+        "exam": "Exam",
+        "homework": "Homework",
+        "event": "Event",
+        "holiday": "Holiday",
+        "meeting": "Meeting"
+      }
+    },
+    "documents": {
+      "title": "Shared Documents & Gallery",
+      "description": "View files and photos shared by the school and teachers.",
+      "searchPlaceholder": "Search documents...",
+      "filterPlaceholder": "Filter by type",
+      "allTypes": "All Document Types",
+      "sharedBy": "Shared by:",
+      "date": "Date:",
+      "download": "Download",
+      "noDocuments": "No documents found.",
+      "noDocumentsDesc": "Check back later for shared files and photos.",
+      "docTypes": {
+        "catering_menu": "Catering Menu",
+        "agenda": "Agenda",
+        "event_photos": "Event Photos",
+        "newsletter": "Newsletter",
+        "school_policy": "School Policy",
+        "class_material": "Class Material"
+      }
+    },
+    "profile": {
+      "title": "My Profile",
+      "description": "Manage your personal information and linked children.",
+      "yourInformation": "Your Information",
+      "emailLabel": "Email",
+      "phoneLabel": "Phone Number",
+      "teacherLabel": "Teacher",
+      "saveButton": "Save Changes",
+      "linkedChildren": "Linked Children",
+      "linkedChildrenDesc": "Information about your children enrolled in the platform.",
+      "viewDetails": "View Details",
+      "linkChildButton": "Link Another Child (Request)",
+      "noChildren": "No children linked to your profile.",
+      "notificationPreferences": "Notification Preferences",
+      "notificationPreferencesDesc": "Manage how you receive notifications.",
+      "enablePush": "Enable Push Notifications",
+      "emailSummaries": "Receive Daily Email Summaries",
+      "urgentSms": "SMS for Urgent Alerts",
+      "accountSecurity": "Account Security",
+      "accountSecurityDesc": "Manage your account security settings.",
+      "changePassword": "Change Password",
+      "enable2FA": "Enable Two-Factor Authentication (Coming Soon)",
+      "deactivateAccount": "Deactivate Account",
+      "profileUpdated": "Profile Updated",
+      "profileUpdatedDesc": "Your profile information has been saved."
+    }
   }
 }

@@ -8,15 +8,17 @@ import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertTriangle, BookOpen, School, Users, CheckCircle } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface CalendarEvent {
   id: string;
   date: Date;
   title: string;
   description: string;
-  type: 'exam' | 'homework' | 'event' | 'holiday' | 'meeting'; // Added meeting
-  courseName?: string; // For course-specific events
-  childName?: string; // To specify which child this event pertains to
+  type: 'exam' | 'homework' | 'event' | 'holiday' | 'meeting';
+  courseName?: string;
+  childName?: string;
   isInstitutionWide: boolean;
 }
 
@@ -29,13 +31,11 @@ const mockEvents: CalendarEvent[] = [
   { id: '6', date: new Date(2023, 9, 5), title: 'Art Exhibition Opening', description: 'Featuring Grade 2 student artwork.', type: 'event', courseName: 'Art Grade 2', childName: 'Mia Williams', isInstitutionWide: false },
 ];
 
-// Add a few more events for today to test selectedDate logic
 const today = new Date();
 mockEvents.push(
     { id: 'today1', date: today, title: 'Today\'s Special Assembly', description: 'Topic: Environmental Awareness', type: 'event', isInstitutionWide: true},
     { id: 'today2', date: today, title: 'Reading Assignment Due (Mia)', description: 'Complete chapter 3 of "The Little Prince"', type: 'homework', courseName: 'English Grade 2', childName: 'Mia Williams', isInstitutionWide: false}
 );
-
 
 const getEventTypeProps = (type: CalendarEvent['type']) => {
   switch (type) {
@@ -51,17 +51,22 @@ const getEventTypeProps = (type: CalendarEvent['type']) => {
 export default function ParentCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+  const { t } = useTranslation();
+  const { language } = useLanguage();
 
-  // Filter events for the selected date
   const eventsForSelectedDate = events.filter(event =>
     selectedDate && event.date.toDateString() === selectedDate.toDateString()
   ).sort((a,b) => a.date.getTime() - b.date.getTime());
 
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
   return (
     <>
       <PageHeader
-        title="My Calendar"
-        description="View school-wide and course-specific events for your children."
+        title={t('parentPortal.calendar.title')}
+        description={t('parentPortal.calendar.description')}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2 shadow-lg">
@@ -84,9 +89,9 @@ export default function ParentCalendarPage() {
         <Card className="md:col-span-1 shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline">
-              Events for: {selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'No date selected'}
+              {selectedDate ? t('parentPortal.calendar.eventsFor', { date: formatDate(selectedDate) }) : t('parentPortal.calendar.noDateSelected')}
             </CardTitle>
-            <CardDescription>Scroll to see all events on this day.</CardDescription>
+            <CardDescription>{t('parentPortal.calendar.eventsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[300px] md:h-[calc(100vh-22rem)]"> {/* Adjust height as needed */}
@@ -103,10 +108,10 @@ export default function ParentCalendarPage() {
                             <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
                             <div className="mt-1.5 space-x-1.5">
                                 <Badge variant="secondary" className="text-xs">
-                                {event.isInstitutionWide ? 'School-Wide' : event.courseName || 'Course Event'}
+                                {event.isInstitutionWide ? t('parentPortal.calendar.eventTypes.schoolWide') : event.courseName || t('parentPortal.calendar.eventTypes.courseEvent')}
                                 </Badge>
                                 {event.childName && !event.isInstitutionWide && <Badge variant="outline" className="text-xs">{event.childName}</Badge>}
-                                <Badge variant="outline" className="text-xs capitalize">{event.type}</Badge>
+                                <Badge variant="outline" className="text-xs capitalize">{t(`parentPortal.calendar.eventTypes.${event.type}`)}</Badge>
                             </div>
                           </div>
                         </div>
@@ -116,7 +121,7 @@ export default function ParentCalendarPage() {
                 </ul>
               ) : (
                 <div className="p-4 text-center text-muted-foreground h-full flex items-center justify-center">
-                  No events scheduled for this day.
+                  {t('parentPortal.calendar.noEvents')}
                 </div>
               )}
             </ScrollArea>

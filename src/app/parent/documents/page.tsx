@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Download, FileText, Image as ImageIcon, FileArchive, Search } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type DocumentType = 'catering_menu' | 'agenda' | 'event_photos' | 'newsletter' | 'school_policy' | 'class_material';
 type FileIconType = 'pdf' | 'image' | 'zip' | 'other';
@@ -38,15 +40,6 @@ const mockDocuments: SharedDocument[] = [
   { id: 'doc5', title: 'Maths Worksheet Ch.5', description: 'Optional practice worksheet for algebra chapter 5.', docType: 'class_material', fileName: 'math_worksheet.pdf', fileUrl: '#', fileIcon: 'pdf', uploadedBy: 'Ms. Davis', uploadedAt: '3 days ago' },
 ];
 
-const docTypeOptions: { value: DocumentType; label: string }[] = [
-    { value: 'class_material', label: 'Class Material' },
-    { value: 'event_photos', label: 'Event Photos' },
-    { value: 'agenda', label: 'Agenda' },
-    { value: 'newsletter', label: 'Newsletter' },
-    { value: 'catering_menu', label: 'Catering Menu' },
-    { value: 'school_policy', label: 'School Policy' },
-];
-
 const getFileIcon = (type: FileIconType) => {
     switch(type) {
         case 'image': return <ImageIcon className="h-12 w-12 text-muted-foreground" />;
@@ -60,6 +53,16 @@ export default function ParentDocumentsPage() {
     const [documents, setDocuments] = useState<SharedDocument[]>(mockDocuments);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState('all');
+    const { t } = useTranslation();
+
+    const docTypeOptions: { value: DocumentType; label: string }[] = [
+      { value: 'class_material', label: t('parentPortal.documents.docTypes.class_material') },
+      { value: 'event_photos', label: t('parentPortal.documents.docTypes.event_photos') },
+      { value: 'agenda', label: t('parentPortal.documents.docTypes.agenda') },
+      { value: 'newsletter', label: t('parentPortal.documents.docTypes.newsletter') },
+      { value: 'catering_menu', label: t('parentPortal.documents.docTypes.catering_menu') },
+      { value: 'school_policy', label: t('parentPortal.documents.docTypes.school_policy') },
+    ];
 
     const filteredDocuments = documents.filter(doc => {
         const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -71,15 +74,15 @@ export default function ParentDocumentsPage() {
     return (
     <>
         <PageHeader
-            title="Shared Documents & Gallery"
-            description="View files and photos shared by the school and teachers."
+            title={t('parentPortal.documents.title')}
+            description={t('parentPortal.documents.description')}
         />
 
         <Card className="mb-6">
             <CardContent className="p-4 flex flex-col md:flex-row gap-4">
                  <Input
                     type="search"
-                    placeholder="Search documents..."
+                    placeholder={t('parentPortal.documents.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="flex-grow"
@@ -87,10 +90,10 @@ export default function ParentDocumentsPage() {
                 />
                 <Select value={filterType} onValueChange={setFilterType}>
                     <SelectTrigger className="w-full md:w-[220px]">
-                        <SelectValue placeholder="Filter by type" />
+                        <SelectValue placeholder={t('parentPortal.documents.filterPlaceholder')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Document Types</SelectItem>
+                        <SelectItem value="all">{t('parentPortal.documents.allTypes')}</SelectItem>
                         {docTypeOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
                     </SelectContent>
                 </Select>
@@ -115,11 +118,11 @@ export default function ParentDocumentsPage() {
                     </CardContent>
                     <CardFooter className="flex-col items-start pt-4 border-t">
                         <div className="text-xs text-muted-foreground w-full">
-                            <p><strong>Shared by:</strong> {doc.uploadedBy}</p>
-                            <p><strong>Date:</strong> {doc.uploadedAt}</p>
+                            <p><strong>{t('parentPortal.documents.sharedBy')}</strong> {doc.uploadedBy}</p>
+                            <p><strong>{t('parentPortal.documents.date')}</strong> {doc.uploadedAt}</p>
                         </div>
                          <Button variant="outline" size="sm" asChild className="w-full mt-4">
-                            <a href={doc.fileUrl} download={doc.fileName}><Download className="mr-2 h-4 w-4" />Download</a>
+                            <a href={doc.fileUrl} download={doc.fileName}><Download className="mr-2 h-4 w-4" />{t('parentPortal.documents.download')}</a>
                         </Button>
                     </CardFooter>
                 </Card>
@@ -128,8 +131,8 @@ export default function ParentDocumentsPage() {
                 <Card className="sm:col-span-2 md:col-span-3 lg:col-span-4">
                     <CardContent className="p-10 text-center text-muted-foreground">
                         <FileText className="mx-auto h-12 w-12 mb-4" />
-                        <p className="text-lg font-semibold">No documents found.</p>
-                        <p>Check back later for shared files and photos.</p>
+                        <p className="text-lg font-semibold">{t('parentPortal.documents.noDocuments')}</p>
+                        <p>{t('parentPortal.documents.noDocumentsDesc')}</p>
                     </CardContent>
                 </Card>
             )}

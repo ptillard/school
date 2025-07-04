@@ -33,7 +33,6 @@
     "toggleTheme": "Cambiar Tema",
     "logout": "Cerrar Sesión",
     "roleLabel": "Rol:",
-    "language": "Idioma",
     "switchToSpanish": "Español",
     "switchToEnglish": "English"
   },
@@ -43,5 +42,126 @@
     "teacher": "Profesor",
     "parent": "Padre/Madre",
     "guest": "Invitado"
+  },
+  "common": {
+    "new": "Nuevo",
+    "viewAll": "Ver Todo",
+    "saveChanges": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Buscar...",
+    "noResults": "No se encontraron resultados."
+  },
+  "dashboard": {
+    "logoutAndHome": "Salir e Inicio",
+    "title": "Panel de {role}",
+    "allRightsReserved": "Todos los derechos reservados."
+  },
+  "parentPortal": {
+    "sidebar": {
+      "home": "Inicio",
+      "notifications": "Notificaciones",
+      "calendar": "Calendario",
+      "documents": "Documentos",
+      "profile": "Perfil"
+    },
+    "dashboard": {
+      "title": "Panel de {childName}",
+      "titleNoChild": "Panel de Padre/Madre",
+      "description": "Manténgase actualizado con las actividades escolares de su hijo.",
+      "selectChildLabel": "Seleccionar Niño/a:",
+      "selectChildPlaceholder": "Seleccione un niño/a",
+      "unreadNotifications": "Notificaciones No Leídas",
+      "unreadNotificationsDesc": "Actualizaciones importantes",
+      "upcomingEvents": "Próximos Eventos",
+      "upcomingEventsDesc": "En los próximos 7 días",
+      "childProfile": "Perfil del Niño/a",
+      "recentNotifications": "Notificaciones Recientes",
+      "recentNotificationsDesc": "Últimas actualizaciones para {childName}.",
+      "recentNotificationsDescNoChild": "Últimas actualizaciones para sus hijos.",
+      "from": "De: {sender}",
+      "noNotifications": "No hay notificaciones recientes."
+    },
+    "notifications": {
+      "title": "Mis Notificaciones",
+      "description": "Todas las comunicaciones sobre sus hijos.",
+      "inbox": "Bandeja de Entrada",
+      "inboxDescription": "Seleccione una notificación para ver los detalles.",
+      "noNotifications": "No hay notificaciones.",
+      "detailsFor": "Para {childName} de {sender}",
+      "attachments": "Archivos Adjuntos:",
+      "conversationHistory": "Historial de Conversación:",
+      "replyPlaceholder": "Escriba su respuesta...",
+      "replyButton": "Responder",
+      "closeButton": "Cerrar",
+      "replySent": "Respuesta Enviada",
+      "replySentDesc": "Su respuesta ha sido enviada al remitente.",
+      "noNotificationSelected": "Ninguna Notificación Seleccionada",
+      "noNotificationSelectedDesc": "Por favor, seleccione una notificación de la lista para ver sus detalles."
+    },
+    "calendar": {
+      "title": "Mi Calendario",
+      "description": "Vea eventos de toda la escuela y específicos del curso para sus hijos.",
+      "eventsFor": "Eventos para: {date}",
+      "noDateSelected": "Ninguna fecha seleccionada",
+      "eventsDescription": "Desplácese para ver todos los eventos de este día.",
+      "noEvents": "No hay eventos programados para este día.",
+      "eventTypes": {
+        "schoolWide": "Toda la Escuela",
+        "courseEvent": "Evento del Curso",
+        "exam": "Examen",
+        "homework": "Tarea",
+        "event": "Evento",
+        "holiday": "Feriado",
+        "meeting": "Reunión"
+      }
+    },
+    "documents": {
+      "title": "Documentos y Galería Compartidos",
+      "description": "Vea archivos y fotos compartidos por la escuela y los maestros.",
+      "searchPlaceholder": "Buscar documentos...",
+      "filterPlaceholder": "Filtrar por tipo",
+      "allTypes": "Todos los Tipos de Documentos",
+      "sharedBy": "Compartido por:",
+      "date": "Fecha:",
+      "download": "Descargar",
+      "noDocuments": "No se encontraron documentos.",
+      "noDocumentsDesc": "Vuelva más tarde para ver archivos y fotos compartidos.",
+      "docTypes": {
+        "catering_menu": "Menú de Comedor",
+        "agenda": "Agenda",
+        "event_photos": "Fotos de Eventos",
+        "newsletter": "Boletín Informativo",
+        "school_policy": "Política Escolar",
+        "class_material": "Material de Clase"
+      }
+    },
+    "profile": {
+      "title": "Mi Perfil",
+      "description": "Administre su información personal y los niños vinculados.",
+      "yourInformation": "Su Información",
+      "emailLabel": "Correo Electrónico",
+      "phoneLabel": "Número de Teléfono",
+      "teacherLabel": "Profesor(a)",
+      "saveButton": "Guardar Cambios",
+      "linkedChildren": "Niños Vinculados",
+      "linkedChildrenDesc": "Información sobre sus hijos inscritos en la plataforma.",
+      "viewDetails": "Ver Detalles",
+      "linkChildButton": "Vincular Otro Niño/a (Solicitud)",
+      "noChildren": "No hay niños vinculados a su perfil.",
+      "notificationPreferences": "Preferencias de Notificación",
+      "notificationPreferencesDesc": "Administre cómo recibe las notificaciones.",
+      "enablePush": "Habilitar Notificaciones Push",
+      "emailSummaries": "Recibir Resúmenes Diarios por Correo",
+      "urgentSms": "SMS para Alertas Urgentes",
+      "accountSecurity": "Seguridad de la Cuenta",
+      "accountSecurityDesc": "Administre la configuración de seguridad de su cuenta.",
+      "changePassword": "Cambiar Contraseña",
+      "enable2FA": "Habilitar Autenticación de Dos Factores (Próximamente)",
+      "deactivateAccount": "Desactivar Cuenta",
+      "profileUpdated": "Perfil Actualizado",
+      "profileUpdatedDesc": "Su información de perfil ha sido guardada."
+    }
   }
 }

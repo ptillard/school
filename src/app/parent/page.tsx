@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from '@/hooks/useTranslation';
 
 
 interface Child {
@@ -69,6 +70,7 @@ export default function ParentDashboardPage() {
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [children, setChildren] = useState<Child[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Simulate fetching data
@@ -85,17 +87,17 @@ export default function ParentDashboardPage() {
   return (
     <>
       <PageHeader
-        title={selectedChild ? `${selectedChild.name}'s Dashboard` : "Parent Dashboard"}
-        description="Stay updated with your child's school activities."
+        title={selectedChild ? t('parentPortal.dashboard.title', { childName: selectedChild.name }) : t('parentPortal.dashboard.titleNoChild')}
+        description={t('parentPortal.dashboard.description')}
       />
 
       {children.length > 1 && (
         <Card className="mb-6 shadow-md">
           <CardContent className="p-4">
-            <Label htmlFor="child-select" className="text-sm font-medium">Select Child:</Label>
+            <Label htmlFor="child-select" className="text-sm font-medium">{t('parentPortal.dashboard.selectChildLabel')}</Label>
             <Select value={selectedChildId || ''} onValueChange={setSelectedChildId}>
               <SelectTrigger id="child-select" className="w-full md:w-[280px] mt-1">
-                <SelectValue placeholder="Select a child" />
+                <SelectValue placeholder={t('parentPortal.dashboard.selectChildPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {children.map(child => (
@@ -119,27 +121,27 @@ export default function ParentDashboardPage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-6">
           <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-headline">Unread Notifications</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">{t('parentPortal.dashboard.unreadNotifications')}</CardTitle>
               <Bell className="h-5 w-5 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{selectedChild.unreadNotifications}</div>
-              <p className="text-xs text-muted-foreground">Important updates</p>
+              <p className="text-xs text-muted-foreground">{t('parentPortal.dashboard.unreadNotificationsDesc')}</p>
             </CardContent>
           </Card>
           <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-headline">Upcoming Events</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">{t('parentPortal.dashboard.upcomingEvents')}</CardTitle>
               <CalendarDays className="h-5 w-5 text-accent" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{selectedChild.upcomingEvents}</div>
-              <p className="text-xs text-muted-foreground">In the next 7 days</p>
+              <p className="text-xs text-muted-foreground">{t('parentPortal.dashboard.upcomingEventsDesc')}</p>
             </CardContent>
           </Card>
            <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-headline">Child Profile</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">{t('parentPortal.dashboard.childProfile')}</CardTitle>
               <UserCircle className="h-5 w-5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -161,11 +163,11 @@ export default function ParentDashboardPage() {
       <Card className="shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="font-headline">Recent Notifications</CardTitle>
-            <CardDescription>Latest updates for {selectedChild ? selectedChild.name : 'your children'}.</CardDescription>
+            <CardTitle className="font-headline">{t('parentPortal.dashboard.recentNotifications')}</CardTitle>
+            <CardDescription>{selectedChild ? t('parentPortal.dashboard.recentNotificationsDesc', {childName: selectedChild.name}) : t('parentPortal.dashboard.recentNotificationsDescNoChild')}</CardDescription>
           </div>
           <Link href="/parent/notifications" passHref>
-            <Button variant="outline" size="sm">View All</Button>
+            <Button variant="outline" size="sm">{t('common.viewAll')}</Button>
           </Link>
         </CardHeader>
         <CardContent>
@@ -181,11 +183,11 @@ export default function ParentDashboardPage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <p className={`font-semibold ${notif.type === 'urgent' ? 'text-destructive' : 'text-foreground'}`}>{notif.title}</p>
-                          {!notif.read && <Badge variant="default" className="bg-primary text-primary-foreground text-xs">New</Badge>}
+                          {!notif.read && <Badge variant="default" className="bg-primary text-primary-foreground text-xs">{t('common.new')}</Badge>}
                         </div>
                          <p className="text-sm text-muted-foreground mt-0.5">{notif.summary}</p>
                          <div className="text-xs text-muted-foreground mt-1.5 flex items-center justify-between">
-                            <span>From: {notif.sender} {notif.courseName && `(${notif.courseName})`}</span>
+                            <span>{t('parentPortal.dashboard.from', {sender: notif.sender})} {notif.courseName && `(${notif.courseName})`}</span>
                             <span>{notif.date}</span>
                          </div>
                       </div>
@@ -195,7 +197,7 @@ export default function ParentDashboardPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-muted-foreground text-center py-8">No recent notifications.</p>
+            <p className="text-muted-foreground text-center py-8">{t('parentPortal.dashboard.noNotifications')}</p>
           )}
         </CardContent>
       </Card>
