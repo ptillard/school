@@ -136,7 +136,7 @@ export default function CsvImportExportPage() {
         description="Bulk manage students, teachers, courses, and enrollments using CSV files."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="font-headline flex items-center"><UploadCloud className="mr-2 h-5 w-5 text-primary"/>Import Data</CardTitle>
