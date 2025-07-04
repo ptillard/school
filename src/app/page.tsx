@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-background to-background p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="items-center text-center">
-          <SchoolComLogo size={48} className="mb-4" />
+          <SchoolComLogo size={48} className="mb-4 text-primary" />
           <CardTitle className="font-headline text-3xl">{t('loginPage.welcomeTitle')}</CardTitle>
           <CardDescription className="text-md">
             {t('loginPage.welcomeDescription')}
