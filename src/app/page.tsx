@@ -10,9 +10,10 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { SchoolComLogo } from '@/components/SchoolComLogo';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Languages } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
@@ -25,6 +26,7 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const { language, toggleLanguage } = useLanguage();
 
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -108,6 +110,10 @@ export default function LoginPage() {
         </ul>
       </div>
        <footer className="mt-8 text-center text-sm text-muted-foreground">
+        <Button variant="ghost" onClick={toggleLanguage} className="mb-4">
+            <Languages className="mr-2 h-4 w-4" />
+            {language === 'en' ? t('userNav.switchToSpanish') : t('userNav.switchToEnglish')}
+        </Button>
         <p dangerouslySetInnerHTML={{ __html: t('loginPage.footer.copyright', { year: currentYear }) }} />
         <p>{t('loginPage.footer.tagline')}</p>
       </footer>
