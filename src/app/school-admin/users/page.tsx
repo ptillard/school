@@ -87,8 +87,9 @@ export default function ManageUsersPage() {
   const [userDepartment, setUserDepartment] = useState('');
   const [userStatus, setUserStatus] = useState<'active' | 'invited'>('invited');
 
+  const action = searchParams.get('action');
+
   useEffect(() => {
-    const action = searchParams.get('action');
     if (action === 'new-student') {
       setEditingUser(null);
       setActiveTab('student');
@@ -100,7 +101,7 @@ export default function ManageUsersPage() {
       setUserRole('teacher'); // Ensure role is set for the form
       setIsFormOpen(true);
     }
-  }, [searchParams]);
+  }, [action]);
 
   useEffect(() => {
     if (isFormOpen) { // Only manage form state if dialog is open

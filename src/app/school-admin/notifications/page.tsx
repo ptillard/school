@@ -59,8 +59,10 @@ export default function SchoolAdminNotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [attachments, setAttachments] = useState<File[]>([]);
 
+  const action = searchParams.get('action');
+
   useEffect(() => {
-    if (searchParams.get('action') === 'new') {
+    if (action === 'new') {
       setActiveTab('compose');
       // Optionally pre-fill or reset fields if needed
       setTitle('');
@@ -69,7 +71,7 @@ export default function SchoolAdminNotificationsPage() {
       setCourseName('All School');
       setAttachments([]);
     }
-  }, [searchParams]);
+  }, [action]);
 
 
   const handleGenerateText = async () => {

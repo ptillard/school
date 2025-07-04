@@ -99,16 +99,16 @@ export default function ParentNotificationsPage() {
     setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
   }, []);
 
+  const notificationId = searchParams.get('notificationId');
+
   useEffect(() => {
-    const notificationId = searchParams.get('notificationId');
     if (notificationId) {
       const notificationToSelect = notifications.find(n => n.id === notificationId);
       if (notificationToSelect) {
         handleSelectNotification(notificationToSelect);
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, notifications]);
+  }, [notificationId, notifications, handleSelectNotification]);
 
 
   const handleSendReply = () => {

@@ -1,6 +1,6 @@
 
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -73,13 +73,28 @@ export default function ManageSchoolsPage() {
     setSchools(mockSchools);
   }, []);
 
-  const resetFormFields = () => {
+  const resetFormFields = useCallback(() => {
     setSchoolName('');
     setAdminEmail('');
     setPrimaryColor('#4285F4');
     setSchoolPhone('');
     setSchoolAddress('');
-  };
+  }, []);
+
+  const handleCreateSchool = useCallback(() => {
+    setEditingSchool(null);
+    resetFormFields(); // Ensure form is reset
+    setIsFormOpen(true);
+  }, [resetFormFields]);
+
+  const action = searchParams.get('action');
+  
+  useEffect(() => {
+    if (action === 'new') {
+      handleCreateSchool();
+    }
+  }, [action, handleCreateSchool]);
+
 
   useEffect(() => {
     if (isFormOpen) {
@@ -93,26 +108,13 @@ export default function ManageSchoolsPage() {
         resetFormFields();
       }
     }
-  }, [isFormOpen, editingSchool]);
-  
-  useEffect(() => {
-    if (searchParams.get('action') === 'new') {
-      handleCreateSchool();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [isFormOpen, editingSchool, resetFormFields]);
 
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     school.adminEmail.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleCreateSchool = () => {
-    setEditingSchool(null);
-    resetFormFields(); // Ensure form is reset
-    setIsFormOpen(true);
-  };
   
   const handleDeleteSchool = () => {
     if (schoolToDelete) {

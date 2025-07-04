@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -84,22 +84,24 @@ export default function SchoolAdminCalendarPage() {
   const [isInstitutionWide, setIsInstitutionWide] = useState(true);
   const [targetAudience, setTargetAudience] = useState<string>("All");
   
-  const resetForm = (dateToSet?: Date) => {
+  const resetForm = useCallback((dateToSet?: Date) => {
     setEventTitle('');
     setEventDescription('');
     setEventType('school_event');
     setEventDate(dateToSet || new Date());
     setIsInstitutionWide(true);
     setTargetAudience("All");
-  };
+  }, []);
+
+  const action = searchParams.get('action');
 
   useEffect(() => {
-    if (searchParams.get('action') === 'new-event') {
+    if (action === 'new-event') {
       setEditingEvent(null);
       resetForm(new Date()); // Reset form with today's date
       setIsFormOpen(true);
     }
-  }, [searchParams]);
+  }, [action, resetForm]);
 
   useEffect(() => {
     if (isFormOpen) {

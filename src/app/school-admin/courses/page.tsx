@@ -87,12 +87,14 @@ export default function ManageCoursesPage() {
   const [teacherId, setTeacherId] = useState<string | undefined>(undefined);
   const [description, setDescription] = useState('');
 
+  const action = searchParams.get('action');
+
   useEffect(() => {
-    if (searchParams.get('action') === 'new-course') {
+    if (action === 'new-course') {
       setEditingCourse(null);
       setIsFormOpen(true);
     }
-  }, [searchParams]);
+  }, [action]);
 
   useEffect(() => {
     if (isFormOpen) {

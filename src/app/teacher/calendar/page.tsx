@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -93,21 +93,23 @@ export default function TeacherCalendarPage() {
   const [eventCourseId, setEventCourseId] = useState<string>(courses.length > 0 ? courses[0].id : '');
   const [eventDate, setEventDate] = useState<Date | undefined>(new Date());
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setEventTitle('');
     setEventDescription('');
     setEventType('lesson');
     setEventCourseId(courses.length > 0 ? courses[0].id : '');
     setEventDate(selectedDate || new Date());
-  };
+  }, [courses, selectedDate]);
+
+  const action = searchParams.get('action');
 
   useEffect(() => {
-    if (searchParams.get('action') === 'new-event') {
+    if (action === 'new-event') {
       setEditingEvent(null);
       resetForm();
       setIsFormOpen(true);
     }
-  }, [searchParams]);
+  }, [action, resetForm]);
 
   useEffect(() => {
     if (editingEvent) {

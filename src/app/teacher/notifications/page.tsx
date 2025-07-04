@@ -1,6 +1,7 @@
 
 "use client";
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,6 +53,7 @@ const mockSentNotifications: TeacherNotification[] = [
 
 export default function TeacherNotificationsPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [eventType, setEventType] = useState('');
@@ -60,6 +62,15 @@ export default function TeacherNotificationsPage() {
   const [sentNotifications, setSentNotifications] = useState<TeacherNotification[]>(mockSentNotifications);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [teacherCourses, setTeacherCourses] = useState<TeacherCourse[]>(mockTeacherCourses);
+  
+  const action = searchParams.get('action');
+
+  useEffect(() => {
+    if (action === 'new') {
+      // Logic for handling a 'new' action can go here
+      // For now, this just makes the dependency explicit
+    }
+  }, [action]);
 
 
   const handleGenerateText = async () => {
