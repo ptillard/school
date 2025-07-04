@@ -99,7 +99,15 @@ export default function LoginPage() {
           </Form>
         </CardContent>
       </Card>
-      <div className="mt-6 w-full max-w-sm rounded-lg border bg-card p-4 text-center text-sm shadow-sm">
+      
+      <div className="mt-6">
+        <Button variant="ghost" onClick={toggleLanguage}>
+            <Languages className="mr-2 h-4 w-4" />
+            {language === 'en' ? t('userNav.switchToSpanish') : t('userNav.switchToEnglish')}
+        </Button>
+      </div>
+
+      <div className="mt-4 w-full max-w-sm rounded-lg border bg-card p-4 text-center text-sm shadow-sm">
         <h4 className="font-semibold text-card-foreground">{t('loginPage.demoInfo.title')}</h4>
         <p className="text-muted-foreground">{t('loginPage.demoInfo.subtitle')}</p>
         <ul className="mt-2 space-y-1 text-left text-xs text-muted-foreground">
@@ -109,11 +117,8 @@ export default function LoginPage() {
           <li><strong>{t('roles.systemAdmin')}:</strong> system.admin@example.com</li>
         </ul>
       </div>
+
        <footer className="mt-8 text-center text-sm text-muted-foreground">
-        <Button variant="ghost" onClick={toggleLanguage} className="mb-4">
-            <Languages className="mr-2 h-4 w-4" />
-            {language === 'en' ? t('userNav.switchToSpanish') : t('userNav.switchToEnglish')}
-        </Button>
         <p dangerouslySetInnerHTML={{ __html: t('loginPage.footer.copyright', { year: currentYear }) }} />
         <p>{t('loginPage.footer.tagline')}</p>
       </footer>
