@@ -3,24 +3,15 @@
   "appTitle": "SchoolCom",
   "loginPage": {
     "welcomeTitle": "Welcome back",
-    "welcomeDescription": "Select your role to sign in.",
-    "roles": {
-      "systemAdmin": {
-        "label": "System Admin",
-        "description": "Manage schools and platform settings."
-      },
-      "schoolAdmin": {
-        "label": "School Admin",
-        "description": "Manage your school, users, and courses."
-      },
-      "teacher": {
-        "label": "Teacher",
-        "description": "Manage courses, notifications & events."
-      },
-      "parent": {
-        "label": "Parent",
-        "description": "View child's updates, notifications & calendar."
-      }
+    "signInDescription": "Sign in to your account to continue.",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "signInButton": "Sign In",
+    "loginFailedTitle": "Login Failed",
+    "loginFailedDescription": "Please check your credentials and try again.",
+    "demoInfo": {
+      "title": "Demo Information",
+      "subtitle": "Use any password with these emails:"
     },
     "footer": {
       "copyright": "© {year} SchoolCom. All rights reserved.",

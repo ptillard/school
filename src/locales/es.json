@@ -3,24 +3,15 @@
   "appTitle": "SchoolCom",
   "loginPage": {
     "welcomeTitle": "Bienvenido de vuelta",
-    "welcomeDescription": "Selecciona tu rol para iniciar sesión.",
-    "roles": {
-      "systemAdmin": {
-        "label": "Administrador del Sistema",
-        "description": "Gestionar escuelas y configuraciones de la plataforma."
-      },
-      "schoolAdmin": {
-        "label": "Administrador Escolar",
-        "description": "Gestionar su escuela, usuarios y cursos."
-      },
-      "teacher": {
-        "label": "Profesor",
-        "description": "Gestionar cursos, notificaciones y eventos."
-      },
-      "parent": {
-        "label": "Padre/Madre",
-        "description": "Ver actualizaciones, notificaciones y calendario del niño."
-      }
+    "signInDescription": "Inicia sesión en tu cuenta para continuar.",
+    "emailLabel": "Correo Electrónico",
+    "passwordLabel": "Contraseña",
+    "signInButton": "Iniciar Sesión",
+    "loginFailedTitle": "Inicio de Sesión Fallido",
+    "loginFailedDescription": "Por favor, verifica tus credenciales e intenta de nuevo.",
+    "demoInfo": {
+      "title": "Información de Demostración",
+      "subtitle": "Use cualquier contraseña con estos correos:"
     },
     "footer": {
       "copyright": "© {year} SchoolCom. Todos los derechos reservados.",

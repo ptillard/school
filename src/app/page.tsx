@@ -1,66 +1,113 @@
 "use client";
 
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth, type UserRole } from '@/contexts/AuthContext';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useAuth } from '@/contexts/AuthContext';
 import { SchoolComLogo } from '@/components/SchoolComLogo';
-import { Building, Briefcase, Users, ShieldCheck, LogIn } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
+const loginSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email." }),
+  password: z.string().min(1, { message: "Password is required." }),
+});
 
 export default function LoginPage() {
   const { login } = useAuth();
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
-  }, []);
 
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const handleLogin = (role: UserRole) => {
-    login(role);
-  };
-
-  type RoleConfig = { name: UserRole; translationKey: string; icon: React.ElementType };
-
-  const roles: RoleConfig[] = [
-    { name: 'systemAdmin', translationKey: 'systemAdmin', icon: ShieldCheck },
-    { name: 'schoolAdmin', translationKey: 'schoolAdmin', icon: Building },
-    { name: 'teacher', translationKey: 'teacher', icon: Briefcase },
-    { name: 'parent', translationKey: 'parent', icon: Users },
-  ];
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    setIsLoading(true);
+    try {
+      await login(values.email, values.password);
+    } catch (error: any) {
+      toast({
+        title: t('loginPage.loginFailedTitle'),
+        description: error.message || t('loginPage.loginFailedDescription'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-background to-background p-4">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-sm shadow-xl">
         <CardHeader className="items-center text-center">
           <SchoolComLogo size={48} className="mb-4 text-primary" />
           <CardTitle className="font-headline text-3xl">{t('loginPage.welcomeTitle')}</CardTitle>
           <CardDescription className="text-md">
-            {t('loginPage.welcomeDescription')}
+            {t('loginPage.signInDescription')}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {roles.map((roleItem) => (
-            <Button
-              key={roleItem.name}
-              onClick={() => handleLogin(roleItem.name)}
-              className="w-full justify-start text-base py-5 group hover:shadow-lg transition-shadow rounded-lg border border-input bg-background hover:bg-primary hover:text-primary-foreground"
-            >
-              <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
-              <div className="text-left">
-                <span className="font-semibold text-primary group-hover:text-primary-foreground">{t(`loginPage.roles.${roleItem.translationKey}.label`)}</span>
-                <p className="text-xs text-muted-foreground group-hover:text-primary-foreground/80 transition-colors">
-                  {t(`loginPage.roles.${roleItem.translationKey}.description`)}
-                </p>
-              </div>
-              <LogIn className="ml-auto h-5 w-5 opacity-50 group-hover:opacity-100 transition-opacity" />
-            </Button>
-          ))}
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('loginPage.emailLabel')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder="name@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('loginPage.passwordLabel')}</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {t('loginPage.signInButton')}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
-      <footer className="mt-8 text-center text-sm text-muted-foreground">
+      <div className="mt-6 w-full max-w-sm rounded-lg border bg-card p-4 text-center text-sm shadow-sm">
+        <h4 className="font-semibold text-card-foreground">{t('loginPage.demoInfo.title')}</h4>
+        <p className="text-muted-foreground">{t('loginPage.demoInfo.subtitle')}</p>
+        <ul className="mt-2 space-y-1 text-left text-xs text-muted-foreground">
+          <li><strong>{t('roles.parent')}:</strong> parent@example.com</li>
+          <li><strong>{t('roles.teacher')}:</strong> teacher@example.com</li>
+          <li><strong>{t('roles.schoolAdmin')}:</strong> school.admin@example.com</li>
+          <li><strong>{t('roles.systemAdmin')}:</strong> system.admin@example.com</li>
+        </ul>
+      </div>
+       <footer className="mt-8 text-center text-sm text-muted-foreground">
         <p dangerouslySetInnerHTML={{ __html: t('loginPage.footer.copyright', { year: currentYear }) }} />
         <p>{t('loginPage.footer.tagline')}</p>
       </footer>

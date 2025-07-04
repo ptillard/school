@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { ReactNode } from 'react';
@@ -11,7 +10,7 @@ interface AuthContextType {
   role: UserRole;
   user: { displayName: string; email: string } | null;
   isLoading: boolean;
-  login: (role: UserRole, user?: { displayName: string; email: string }) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -29,47 +28,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const storedRole = localStorage.getItem('schoolcom-role') as UserRole;
       const storedUser = localStorage.getItem('schoolcom-user');
-      if (storedRole) {
+      if (storedRole && storedUser) {
         setRole(storedRole);
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        } else {
-           setUser({ displayName: `${storedRole.charAt(0).toUpperCase() + storedRole.slice(1)} User`, email: `${storedRole}@example.com` });
-        }
+        setUser(JSON.parse(storedUser));
       }
     } catch (error) {
       console.error("Error reading from localStorage", error);
-      // Handle potential SSR or secure environment issues
     }
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((newRole: UserRole, newUser?: { displayName: string; email: string }) => {
-    const resolvedUser = newUser || { displayName: `${newRole!.charAt(0).toUpperCase() + newRole!.slice(1)} User`, email: `${newRole}@example.com` };
+  const login = useCallback(async (email: string, password: string) => {
+    // In a real app, you'd call Firebase Auth here.
+    // For now, we simulate it based on email. The password is ignored.
+    let newRole: UserRole = null;
+    let displayName: string = 'User';
+
+    if (email.toLowerCase().startsWith('parent')) {
+        newRole = 'parent';
+        displayName = 'Parent User';
+    } else if (email.toLowerCase().startsWith('teacher')) {
+        newRole = 'teacher';
+        displayName = 'Teacher User';
+    } else if (email.toLowerCase().startsWith('school.admin')) {
+        newRole = 'schoolAdmin';
+        displayName = 'School Admin';
+    } else if (email.toLowerCase().startsWith('system.admin')) {
+        newRole = 'systemAdmin';
+        displayName = 'System Admin';
+    }
+
+    if (!newRole) {
+        // This error will be caught by the form's onSubmit handler
+        throw new Error("Invalid credentials. Please use one of the demo emails.");
+    }
+    
+    const newUser = { displayName, email };
     setRole(newRole);
-    setUser(resolvedUser);
+    setUser(newUser);
     try {
-      localStorage.setItem('schoolcom-role', newRole!);
-      localStorage.setItem('schoolcom-user', JSON.stringify(resolvedUser));
+      localStorage.setItem('schoolcom-role', newRole);
+      localStorage.setItem('schoolcom-user', JSON.stringify(newUser));
     } catch (error) {
        console.error("Error writing to localStorage", error);
     }
 
     switch (newRole) {
-      case 'systemAdmin':
-        router.push('/system-admin');
-        break;
-      case 'schoolAdmin':
-        router.push('/school-admin');
-        break;
-      case 'teacher':
-        router.push('/teacher');
-        break;
-      case 'parent':
-        router.push('/parent');
-        break;
-      default:
-        router.push('/');
+      case 'systemAdmin': router.push('/system-admin'); break;
+      case 'schoolAdmin': router.push('/school-admin'); break;
+      case 'teacher': router.push('/teacher'); break;
+      case 'parent': router.push('/parent'); break;
+      default: router.push('/');
     }
   }, [router]);
 
@@ -84,13 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
     router.push('/');
   }, [router]);
-
-  useEffect(() => {
-    if (!isLoading && !role && !pathname.startsWith('/auth') && pathname !== '/') {
-        // router.push('/'); // Uncomment this to redirect to login if not authenticated
-    }
-  }, [isLoading, role, pathname, router]);
-
 
   return (
     <AuthContext.Provider value={{ role, user, isLoading, login, logout }}>
