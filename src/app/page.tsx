@@ -47,8 +47,7 @@ export default function LoginPage() {
             <Button
               key={roleItem.name}
               onClick={() => handleLogin(roleItem.name)}
-              className="w-full justify-start text-base py-5 group hover:shadow-lg transition-shadow rounded-lg"
-              variant="outline"
+              className="w-full justify-start text-base py-5 group hover:shadow-lg transition-shadow rounded-lg border border-input bg-background hover:bg-primary hover:text-primary-foreground"
             >
               <roleItem.icon className="mr-3 h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors" />
               <div className="text-left">
