@@ -2,6 +2,43 @@
 
 This is a Next.js project for SchoolCom, a school communication platform, built within Firebase Studio.
 
+## About SchoolCom
+
+SchoolCom is a multi-faceted communication platform designed to streamline interactions within an educational ecosystem. It provides distinct portals for different user roles, each with a tailored set of tools and features.
+
+### User Roles & Features
+
+*   **Parent:**
+    *   **Dashboard:** View a summary of their child's recent activity, unread notifications, and upcoming events.
+    *   **Notifications:** Receive and reply to communications from teachers and school administrators.
+    *   **Calendar:** View a personalized calendar with school-wide events and class-specific deadlines.
+    *   **Documents & Gallery:** Access and download shared files, photos, and newsletters from the school.
+    *   **Profile:** Manage personal information and view linked children's profiles.
+
+*   **Teacher:**
+    *   **Dashboard:** Get a quick overview of active courses, student counts, and recent activity.
+    *   **Course Management:** View and manage their assigned courses.
+    *   **Send Notifications:** Compose and send notifications to students and parents of specific courses, with AI-powered assistance for generating text.
+    *   **Course Calendar:** Manage and view events, deadlines, and lesson plans for their courses.
+    *   **Shared Documents:** Upload and share class materials, photos, and files with students, parents, and other teachers.
+    *   **Profile Management:** Update personal and professional details.
+
+*   **School Administrator:**
+    *   **Dashboard:** See a high-level view of school statistics like student/teacher counts and quick actions.
+    *   **User Management:** Add, edit, and manage student, teacher, and staff accounts.
+    *   **Course Management:** Create, assign, and oversee all courses offered at the school.
+    *   **School-Wide Notifications:** Send announcements to the entire school community.
+    *   **School Calendar:** Manage the official school calendar for holidays, events, and important dates.
+    *   **Document Sharing:** Manage the school's central repository for shared documents like policies and newsletters.
+    *   **Customization:** Customize the school's branding, including logo and theme colors.
+    *   **CSV Import/Export:** Bulk manage users and courses via CSV files.
+
+*   **System Administrator:**
+    *   **Platform Dashboard:** Monitor overall platform health, including the number of schools and active users.
+    *   **School Management:** Onboard new schools, manage existing institutions, and configure their settings.
+    *   **Usage Statistics:** View analytics on platform-wide user engagement and activity.
+    *   **Platform Settings:** Configure global settings for security, notifications, and other core features.
+
 ## Getting Started Locally
 
 To run this application on your local machine (e.g., a Mac using VS Code), follow these steps:
