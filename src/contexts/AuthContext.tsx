@@ -18,7 +18,7 @@ import {
   signOut,
   type User as FirebaseUser
 } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { firebaseApp } from '@/lib/firebase'; // We'll create this file
 
 export type UserRole = 'systemAdmin' | 'schoolAdmin' | 'teacher' | 'parent' | null;
@@ -48,22 +48,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserProfile = useCallback(async (firebaseUser: FirebaseUser): Promise<UserProfile | null> => {
     const db = getFirestore(firebaseApp);
-    // Correct Path: Looks for a document with the user's ID directly in the 'users' collection.
-    const userDocRef = doc(db, 'users', firebaseUser.uid); 
-    const userDocSnap = await getDoc(userDocRef);
+    const usersCollectionRef = collection(db, 'users');
+    
+    // Query for the user document where the email matches.
+    // This is more robust than relying on the document ID matching the UID.
+    const q = query(usersCollectionRef, where("email", "==", firebaseUser.email), limit(1));
+    const querySnapshot = await getDocs(q);
 
-    if (userDocSnap.exists()) {
+    if (!querySnapshot.empty) {
+      const userDocSnap = querySnapshot.docs[0];
       const userData = userDocSnap.data();
       const userProfile: UserProfile = {
         displayName: userData.displayName || firebaseUser.displayName || 'User',
         email: userData.email || firebaseUser.email || '',
         role: userData.role || null,
       };
-      // Update last login timestamp
-      await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
+      
+      // Update last login timestamp on the found document
+      await setDoc(userDocSnap.ref, { lastLogin: new Date() }, { merge: true });
       return userProfile;
     } else {
-      console.warn(`No user profile found in Firestore for UID: ${firebaseUser.uid}. This user will have no role.`);
+      console.warn(`No user profile found in Firestore for email: ${firebaseUser.email}. This user will have no role.`);
+      // Also check if a document with UID exists, as a fallback
+      const userDocRefByUid = doc(db, 'users', firebaseUser.uid);
+      const userDocSnapByUid = await getDoc(userDocRefByUid);
+       if (userDocSnapByUid.exists()) {
+          const userData = userDocSnapByUid.data();
+          const userProfile: UserProfile = {
+            displayName: userData.displayName || firebaseUser.displayName || 'User',
+            email: userData.email || firebaseUser.email || '',
+            role: userData.role || null,
+          };
+          await setDoc(userDocRefByUid, { lastLogin: new Date() }, { merge: true });
+          return userProfile;
+       }
+      
       return {
         displayName: firebaseUser.displayName || 'User',
         email: firebaseUser.email || '',
