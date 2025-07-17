@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ReactNode } from 'react';
@@ -50,29 +51,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   const fetchUserProfile = useCallback(async (firebaseUser: FirebaseUser): Promise<UserProfile | null> => {
+    if (!firebaseUser.uid) return null;
+    
     const db = getFirestore(firebaseApp);
     const userDocRef = doc(db, 'users', firebaseUser.uid);
-    const userDocSnap = await getDoc(userDocRef);
+    
+    try {
+      const userDocSnap = await getDoc(userDocRef);
 
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      const userProfile: UserProfile = {
-        displayName: userData.displayName || firebaseUser.displayName || 'User',
-        email: userData.email || firebaseUser.email || '',
-        role: userData.role || null,
-      };
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const userProfile: UserProfile = {
+          displayName: userData.displayName || firebaseUser.displayName || 'User',
+          email: userData.email || firebaseUser.email || '',
+          role: userData.role || null,
+        };
+        
+        // Update last login timestamp without waiting
+        await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
 
-      // Update last login timestamp
-      await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
-
-      return userProfile;
-    } else {
-      console.warn(`No Firestore user document found for UID: ${firebaseUser.uid}`);
-      return {
-        displayName: firebaseUser.displayName || 'User',
-        email: firebaseUser.email || '',
-        role: null,
-      };
+        return userProfile;
+      } else {
+        console.warn(`No Firestore user document found for UID: ${firebaseUser.uid}`);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      // This will happen if security rules block the read
+      return null;
     }
   }, []);
 
@@ -82,9 +88,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       if (firebaseUser) {
         const userProfile = await fetchUserProfile(firebaseUser);
-        if (userProfile) {
+        if (userProfile && userProfile.role) {
           setUser(userProfile);
           setRole(userProfile.role);
+        } else {
+          // If no profile or role, treat as logged out for security
+          await signOut(auth);
+          setUser(null);
+          setRole(null);
         }
       } else {
         setUser(null);
@@ -98,27 +109,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = useCallback(async (email: string, password: string) => {
     const auth = getAuth(firebaseApp);
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const firebaseUser = userCredential.user;
-
-    const userProfile = await fetchUserProfile(firebaseUser);
-    if (!userProfile || !userProfile.role) {
-      await signOut(auth); // Sign out user if they don't have a valid profile/role
-      throw new Error("Login failed: User profile or role not found.");
-    }
-
-    setUser(userProfile);
-    setRole(userProfile.role);
-
-    // Redirect after login based on role
-    switch (userProfile.role) {
-      case 'systemAdmin': router.push('/system-admin'); break;
-      case 'schoolAdmin': router.push('/school-admin'); break;
-      case 'teacher': router.push('/teacher'); break;
-      case 'parent': router.push('/parent'); break;
-      default: router.push('/');
-    }
-  }, [router, fetchUserProfile]);
+    // The onAuthStateChanged listener will handle fetching the profile and redirecting
+    await signInWithEmailAndPassword(auth, email, password);
+    // After sign-in, the useEffect listener will fire, fetching the user profile
+    // and setting the user/role state, which triggers the correct redirect.
+  }, []);
 
   const logout = useCallback(async () => {
     const auth = getAuth(firebaseApp);
@@ -127,6 +122,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRole(null);
     router.push('/');
   }, [router]);
+  
+  // This effect handles redirection after the user state is updated
+  useEffect(() => {
+    if (!isLoading && user && role) {
+      switch (role) {
+        case 'systemAdmin': router.push('/system-admin'); break;
+        case 'schoolAdmin': router.push('/school-admin'); break;
+        case 'teacher': router.push('/teacher'); break;
+        case 'parent': router.push('/parent'); break;
+        default: router.push('/');
+      }
+    }
+  }, [user, role, isLoading, router]);
+
 
   return (
     <AuthContext.Provider value={{ role, user, isLoading, login, logout }}>
