@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserProfile = useCallback(async (firebaseUser: FirebaseUser): Promise<UserProfile | null> => {
     const db = getFirestore(firebaseApp);
-    // FIX: Point to the nested collection path users/users/{uid}
-    const userDocRef = doc(db, 'users', 'users', firebaseUser.uid); 
+    // Correct Path: Looks for a document with the user's ID directly in the 'users' collection.
+    const userDocRef = doc(db, 'users', firebaseUser.uid); 
     const userDocSnap = await getDoc(userDocRef);
 
     if (userDocSnap.exists()) {
