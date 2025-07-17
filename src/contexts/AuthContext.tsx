@@ -1,9 +1,7 @@
-
 "use client";
 
 import type { ReactNode } from 'react';
-import React, from 'react';
-import { 
+import React, { 
   createContext, 
   useContext, 
   useState, 
@@ -11,15 +9,20 @@ import {
   useCallback 
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut,
   type User as FirebaseUser
 } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
-import { firebaseApp } from '@/lib/firebase'; // We'll create this file
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
+} from 'firebase/firestore';
+import { firebaseApp } from '@/lib/firebase';
 
 export type UserRole = 'systemAdmin' | 'schoolAdmin' | 'teacher' | 'parent' | null;
 
@@ -48,45 +51,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUserProfile = useCallback(async (firebaseUser: FirebaseUser): Promise<UserProfile | null> => {
     const db = getFirestore(firebaseApp);
-    const usersCollectionRef = collection(db, 'users');
-    
-    // Query for the user document where the email matches.
-    // This is more robust than relying on the document ID matching the UID.
-    const q = query(usersCollectionRef, where("email", "==", firebaseUser.email), limit(1));
-    const querySnapshot = await getDocs(q);
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    const userDocSnap = await getDoc(userDocRef);
 
-    if (!querySnapshot.empty) {
-      const userDocSnap = querySnapshot.docs[0];
+    if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
       const userProfile: UserProfile = {
         displayName: userData.displayName || firebaseUser.displayName || 'User',
         email: userData.email || firebaseUser.email || '',
         role: userData.role || null,
       };
-      
-      // Update last login timestamp on the found document
-      await setDoc(userDocSnap.ref, { lastLogin: new Date() }, { merge: true });
+
+      // Update last login timestamp
+      await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
+
       return userProfile;
     } else {
-      console.warn(`No user profile found in Firestore for email: ${firebaseUser.email}. This user will have no role.`);
-      // Also check if a document with UID exists, as a fallback
-      const userDocRefByUid = doc(db, 'users', firebaseUser.uid);
-      const userDocSnapByUid = await getDoc(userDocRefByUid);
-       if (userDocSnapByUid.exists()) {
-          const userData = userDocSnapByUid.data();
-          const userProfile: UserProfile = {
-            displayName: userData.displayName || firebaseUser.displayName || 'User',
-            email: userData.email || firebaseUser.email || '',
-            role: userData.role || null,
-          };
-          await setDoc(userDocRefByUid, { lastLogin: new Date() }, { merge: true });
-          return userProfile;
-       }
-      
+      console.warn(`No Firestore user document found for UID: ${firebaseUser.uid}`);
       return {
         displayName: firebaseUser.displayName || 'User',
         email: firebaseUser.email || '',
-        role: null, // No profile, no role
+        role: null,
       };
     }
   }, []);
@@ -110,12 +95,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => unsubscribe();
   }, [fetchUserProfile]);
-  
+
   const login = useCallback(async (email: string, password: string) => {
     const auth = getAuth(firebaseApp);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
-    
+
     const userProfile = await fetchUserProfile(firebaseUser);
     if (!userProfile || !userProfile.role) {
       await signOut(auth); // Sign out user if they don't have a valid profile/role
@@ -125,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(userProfile);
     setRole(userProfile.role);
 
-    // Redirect after login
+    // Redirect after login based on role
     switch (userProfile.role) {
       case 'systemAdmin': router.push('/system-admin'); break;
       case 'schoolAdmin': router.push('/school-admin'); break;
