@@ -1,14 +1,37 @@
 "use client";
 
 import type { ReactNode } from 'react';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, from 'react';
+import { 
+  createContext, 
+  useContext, 
+  useState, 
+  useEffect, 
+  useCallback 
+} from 'react';
+import { useRouter } from 'next/navigation';
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  signOut,
+  type User as FirebaseUser
+} from 'firebase/auth';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { firebaseApp } from '@/lib/firebase'; // We'll create this file
 
 export type UserRole = 'systemAdmin' | 'schoolAdmin' | 'teacher' | 'parent' | null;
 
+interface UserProfile {
+  displayName: string;
+  email: string;
+  role: UserRole;
+  lastLogin?: Date;
+}
+
 interface AuthContextType {
   role: UserRole;
-  user: { displayName: string; email: string } | null;
+  user: UserProfile | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -18,79 +41,84 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<UserRole>(null);
-  const [user, setUser] = useState<{ displayName: string; email: string } | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
-  useEffect(() => {
-    // Simulate checking auth status from localStorage or an API
-    try {
-      const storedRole = localStorage.getItem('schoolcom-role') as UserRole;
-      const storedUser = localStorage.getItem('schoolcom-user');
-      if (storedRole && storedUser) {
-        setRole(storedRole);
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error("Error reading from localStorage", error);
+  const fetchUserProfile = useCallback(async (firebaseUser: FirebaseUser): Promise<UserProfile | null> => {
+    const db = getFirestore(firebaseApp);
+    const userDocRef = doc(db, 'users', firebaseUser.uid);
+    const userDocSnap = await getDoc(userDocRef);
+
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      const userProfile: UserProfile = {
+        displayName: userData.displayName || firebaseUser.displayName || 'User',
+        email: userData.email || firebaseUser.email || '',
+        role: userData.role || null,
+      };
+      // Update last login timestamp
+      await setDoc(userDocRef, { lastLogin: new Date() }, { merge: true });
+      return userProfile;
+    } else {
+      console.warn(`No user profile found in Firestore for UID: ${firebaseUser.uid}. This user will have no role.`);
+      return {
+        displayName: firebaseUser.displayName || 'User',
+        email: firebaseUser.email || '',
+        role: null, // No profile, no role
+      };
     }
-    setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    const auth = getAuth(firebaseApp);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setIsLoading(true);
+      if (firebaseUser) {
+        const userProfile = await fetchUserProfile(firebaseUser);
+        if (userProfile) {
+          setUser(userProfile);
+          setRole(userProfile.role);
+        }
+      } else {
+        setUser(null);
+        setRole(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [fetchUserProfile]);
+  
   const login = useCallback(async (email: string, password: string) => {
-    // In a real app, you'd call Firebase Auth here.
-    // For now, we simulate it based on email. The password is ignored.
-    let newRole: UserRole = null;
-    let displayName: string = 'User';
-
-    if (email.toLowerCase().startsWith('parent')) {
-        newRole = 'parent';
-        displayName = 'Parent User';
-    } else if (email.toLowerCase().startsWith('teacher')) {
-        newRole = 'teacher';
-        displayName = 'Teacher User';
-    } else if (email.toLowerCase().startsWith('school.admin')) {
-        newRole = 'schoolAdmin';
-        displayName = 'School Admin';
-    } else if (email.toLowerCase().startsWith('system.admin')) {
-        newRole = 'systemAdmin';
-        displayName = 'System Admin';
-    }
-
-    if (!newRole) {
-        // This error will be caught by the form's onSubmit handler
-        throw new Error("Invalid credentials. Please use one of the demo emails.");
-    }
+    const auth = getAuth(firebaseApp);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
     
-    const newUser = { displayName, email };
-    setRole(newRole);
-    setUser(newUser);
-    try {
-      localStorage.setItem('schoolcom-role', newRole);
-      localStorage.setItem('schoolcom-user', JSON.stringify(newUser));
-    } catch (error) {
-       console.error("Error writing to localStorage", error);
+    const userProfile = await fetchUserProfile(firebaseUser);
+    if (!userProfile || !userProfile.role) {
+      await signOut(auth); // Sign out user if they don't have a valid profile/role
+      throw new Error("Login failed: User profile or role not found.");
     }
 
-    switch (newRole) {
+    setUser(userProfile);
+    setRole(userProfile.role);
+
+    // Redirect after login
+    switch (userProfile.role) {
       case 'systemAdmin': router.push('/system-admin'); break;
       case 'schoolAdmin': router.push('/school-admin'); break;
       case 'teacher': router.push('/teacher'); break;
       case 'parent': router.push('/parent'); break;
       default: router.push('/');
     }
-  }, [router]);
+  }, [router, fetchUserProfile]);
 
-  const logout = useCallback(() => {
-    setRole(null);
+  const logout = useCallback(async () => {
+    const auth = getAuth(firebaseApp);
+    await signOut(auth);
     setUser(null);
-    try {
-      localStorage.removeItem('schoolcom-role');
-      localStorage.removeItem('schoolcom-user');
-    } catch (error) {
-      console.error("Error clearing localStorage", error);
-    }
+    setRole(null);
     router.push('/');
   }, [router]);
 
