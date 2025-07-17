@@ -24,7 +24,8 @@
     "logout": "Log out",
     "roleLabel": "Role:",
     "switchToSpanish": "Español",
-    "switchToEnglish": "English"
+    "switchToEnglish": "English",
+    "userGuide": "User Guide"
   },
   "roles": {
     "systemAdmin": "System Admin",

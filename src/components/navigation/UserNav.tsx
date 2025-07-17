@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, UserCircle, Sun, Moon, Languages } from "lucide-react";
+import { LogOut, UserCircle, Sun, Moon, Languages, HelpCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -106,6 +106,12 @@ export function UserNav() {
         <DropdownMenuItem onClick={handleToggleLanguage}>
           <Languages className="mr-2 h-4 w-4" />
           <span>{language === 'en' ? t('userNav.switchToSpanish') : t('userNav.switchToEnglish')}</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+            <a href="/USER_GUIDE.md" target="_blank" rel="noopener noreferrer">
+                <HelpCircle className="mr-2 h-4 w-4" />
+                <span>{t('userNav.userGuide')}</span>
+            </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
